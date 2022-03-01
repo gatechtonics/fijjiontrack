@@ -1,0 +1,12 @@
+out
+.idea
+
+*.xml
+*.iml
+*.class
+*.jar
+*.war
+*.aar
+.DS_Store
+javafx-sdk-17.0.0.1/
+javafx-sdk-11.0.2/
