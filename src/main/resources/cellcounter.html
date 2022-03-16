@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 TRANSITIONAL//EN">
+<!--
+  #%L
+  Cell Counter plugin for ImageJ.
+  %%
+  Copyright (C) 2001 - 2019 Fiji developers.
+  %%
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public
+  License along with this program.  If not, see
+  <http://www.gnu.org/licenses/gpl-3.0.html>.
+  #L%
+  -->
+
+<html>
+	<head>
+		<title>Cell Counter</title>
+		<link rel="stylesheet" type="text/css" href="../../stylesheet.css" title="Style">
+	</head>
+<body>
+
+<BR></BR>
+<FONT ID="Title">Cell Counter</FONT>
+
+<h3>Description:</h3>
+<p>This plugin will open a new cell counter GUI.
+On the left are the counter types and counters, on the right the action buttons.<br>
+<br>
+<b>Initialize:</b> Initializes the current image or stack for counting, this will create a duplicate image/stack titled "counter window" - when keep original is checked, the source image remains open<br>
+<b>Add:</b> adds a counter type.<br>
+<b>Remove:</b> removes the last counter type.<br>
+<b>Delete mode:</b> toggles between insert and delete mode. When checked, the marker of the currently selected type closest to the mouse cursor will be deleted when you click.<br>
+<b>Delete:</b> delete the last placed marker.<br>
+<b>Reset:</b> reset all counters to 0.<br>
+<b>Results:</b> Shows the counter results in the ImageJ results table. In case of a stack the counts per slice and the totals are displayed.<br>
+<b>Show Numbers:</b> If selected the number corresponding to the type is shown, else just the marker is drawn.<br>
+<b>Save Markers:</b> Exports the marker data to an XML file - Only available when running java 1.4 or higher<br>
+<b>Load Markers:</b> Loads stored marker data from and XML file - - Only available when running java 1.4 or higher<br>
+<b>Export Image:</b> Makes a copy of the counter image with the markers written on it (only the current slice is copied in case of a stack)<br>
+<b>Measure...:</b> Measures the pixel value at each marker and displays a result window showing: Type - Slice - X coordinate - Y coordinate - Pixel Value<br>
+</p>
+
+<h3>Usage:</h3>
+<p>Open the Cell Counter plugin and the image/stack you want to count (if the Cell Counter plugin is already open you don't need to open a new instance). Click initialize, now you are ready to count features. <br>
+Note that at any time you can add types or remove them.
+Select the type you want to count, and count by clicking on the feature in the image. A colored marker and number (if selected) corresponding to the type you are counting will be displayed on the image every time you click, and the corresponding counter is updated.
+</p>
+
+<h3>Requirements:</h3>
+<p>This plugin requires ImageJ 1.34m or newer.<BR> Exporting and loading of marker data requires java 1.4 or higher.
+
+<h3>Source:</h3>
+<p>Included in cell_counter.jar, and is released under the GNU General Public License.</p>
+
+<h3>Installation:</h3>
+<p>Download <FONT ID="Links"><A HREF="download/cell_counter.jar">cell_counter.jar</A></FONT> to the plugins folder.</p>
+
+<p><FONT ID="Links">| <a href="index.html">Plugins</a> | <a href="../index.html">Home</a> |</FONT></p>
+</body>
+</html>
