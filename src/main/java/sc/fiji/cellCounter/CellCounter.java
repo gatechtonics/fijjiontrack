@@ -62,6 +62,7 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.EtchedBorder;
 
+import javafx.scene.layout.GridPane;
 import org.scijava.Context;
 import org.scijava.command.CommandService;
 
@@ -103,14 +104,18 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 	private Map<String,String> metaData = new HashMap<>();
 
 	private JPanel dynPanel;
+
 	private JPanel dynButtonPanel;
 	private JPanel statButtonPanel;
+	private JPanel autoPanel;
+	private JPanel autoButtonPanel;
 	private JPanel dynTxtPanel;
 	private JCheckBox delCheck;
 	private JCheckBox newCheck;
 	private JCheckBox numbersCheck;
 	private JCheckBox showAllCheck;
 	private ButtonGroup radioGrp;
+	private ButtonGroup autoButtonGrp;
 	private JSeparator separator;
 	private JButton addButton;
 	private JButton removeButton;
@@ -171,8 +176,36 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 
 		radioGrp = new ButtonGroup();// to group the radiobuttons
 
+		autoButtonGrp = new ButtonGroup();
+
 		dynGrid = new GridLayout(8, 1);
 		dynGrid.setVgap(2);
+
+		//This panel is for automatic counting buttons
+		autoPanel = new JPanel();
+		autoPanel.setBorder(BorderFactory.createTitledBorder("Automatic"));
+		autoPanel.setLayout(gb);
+
+		// this panel keeps the radiobuttons
+		autoButtonPanel = new JPanel();
+		GridLayout grid = new GridLayout(2, 1);
+		grid.setVgap(2);
+		autoButtonPanel.setLayout(grid);
+
+		GridBagConstraints gbc1 = new GridBagConstraints();
+		gbc1.anchor = GridBagConstraints.NORTHWEST;
+		gbc1.fill = GridBagConstraints.BOTH;
+		gbc1.ipadx = 5;
+		gbc1.gridy = 1;
+		gb.setConstraints(autoPanel, gbc1);
+		autoPanel.add(autoButtonPanel);
+
+		autoButtonPanel.add(makeAutoRadioButton("AiTracktive"));
+		autoButtonPanel.add(makeAutoRadioButton("Skeletracks"));
+		getContentPane().add(autoPanel);
+
+
+
 
 		// this panel will keep the dynamic GUI parts
 		dynPanel = new JPanel();
@@ -260,7 +293,7 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		addButton = makeButton(ADD, "add a counter type");
 		gb.setConstraints(addButton, gbc);
-		statButtonPanel.add(addButton);
+		//statButtonPanel.add(addButton); REMOVED THE ADD BUTTON
 
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -269,7 +302,7 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		removeButton = makeButton(REMOVE, "remove last counter type");
 		gb.setConstraints(removeButton, gbc);
-		statButtonPanel.add(removeButton);
+		//statButtonPanel.add(removeButton); REMOVED THE REMOVE BUTTON
 
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -279,7 +312,7 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 		renameButton = makeButton(RENAME, "rename selected counter type");
 		renameButton.setEnabled(false);
 		gb.setConstraints(renameButton, gbc);
-		statButtonPanel.add(renameButton);
+		//statButtonPanel.add(renameButton); REMOVED THE RENAME BUTTON
 
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -489,6 +522,12 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 		return jrButton;
 	}
 
+	private JRadioButton makeAutoRadioButton(final String id) {
+		final JRadioButton jrButton = new JRadioButton(id);
+		autoButtonGrp.add(jrButton);
+		return jrButton;
+	}
+
 	private JButton makeButton(final String name, final String tooltip) {
 		final JButton jButton = new JButton(name);
 		jButton.setToolTipText(tooltip);
@@ -576,6 +615,8 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 	void validateLayout() {
 		dynPanel.validate();
 		dynButtonPanel.validate();
+		autoPanel.validate();
+		autoButtonPanel.validate();
 		dynTxtPanel.validate();
 		statButtonPanel.validate();
 		validate();
