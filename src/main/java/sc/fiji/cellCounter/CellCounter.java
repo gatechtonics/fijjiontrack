@@ -80,7 +80,7 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 	private static final String INITIALIZE = "Initialize";
 	private static final String OPTIONS = "Options";
 	private static final String RESULTS = "Results";
-	private static final String DELETE = "Delete";
+	private static final String DELETE = "Undo";
 	private static final String DELMODE = "Delete Mode";
 	private static final String KEEPORIGINAL = "Keep Original";
 	private static final String SHOWNUMBERS = "Show Numbers";
