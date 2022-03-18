@@ -93,10 +93,27 @@ public class CellCntrImageCanvas extends ImageCanvas {
 			currentMarkerVector.addMarker(m);
 		}
 		else {
-			final CellCntrMarker m =
-				currentMarkerVector.getMarkerFromPosition(new Point(x, y), img
-					.getCurrentSlice());
-			currentMarkerVector.remove(m);
+			Point p = new Point(x, y);
+			CellCntrMarker currentsmallest = currentMarkerVector.getMarkerFromPosition(new Point(x, y), 1);
+			for(int i = 1; i <= img.getStackSize(); i++) {
+				CellCntrMarker m =
+						currentMarkerVector.getMarkerFromPosition(new Point(x, y), i);
+				if(m == null) {
+					continue;
+				}
+				if(currentsmallest == null) {
+					currentsmallest = m;
+				}
+				final Point p1 =
+						new Point(currentsmallest.getX(), currentsmallest.getY());
+				final Point p2 = new Point(m.getX(), m.getY());
+				final boolean closer =
+						Math.abs(p1.distance(p)) > Math.abs(p2.distance(p));
+				if (closer) {
+					currentsmallest = m;
+				}
+			}
+			currentMarkerVector.remove(currentsmallest);
 		}
 		repaint();
 		cc.populateTxtFields();
@@ -156,14 +173,13 @@ public class CellCntrImageCanvas extends ImageCanvas {
 			final ListIterator<CellCntrMarker> mit = mv.listIterator();
 			while (mit.hasNext()) {
 				final CellCntrMarker m = mit.next();
-				final boolean sameSlice = m.getZ() == img.getCurrentSlice();
-				if (sameSlice || showAll) {
+				if (true || showAll) {
 					xM = ((m.getX() - srcRect.x) * magnification);
 					yM = ((m.getY() - srcRect.y) * magnification);
-					if (sameSlice) g2.fillOval((int) xM - 2, (int) yM - 2, 4, 4);
-					else g2.drawOval((int) xM - 2, (int) yM - 2, 4, 4);
+					g2.fillOval((int) xM - 2, (int) yM - 2, 4, 4);
+					g2.drawOval((int) xM - 2, (int) yM - 2, 4, 4);
 					if (showNumbers) g2.drawString(Integer.toString(typeID),
-						(int) xM + 3, (int) yM - 3);
+							(int) xM + 3, (int) yM - 3);
 				}
 			}
 		}
