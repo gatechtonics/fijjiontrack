@@ -142,7 +142,7 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 	static CellCounter instance;
 
 	public CellCounter() {
-		super("Cell Counter");
+		super("Fijjiontrack");
 		setResizable(false);
 		typeVector = new Vector<CellCntrMarkerVector>();
 		txtFieldVector = new Vector<JTextField>();
