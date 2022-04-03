@@ -87,6 +87,9 @@ public class CellCntrMarkerVector extends Vector<CellCntrMarker> {
 				v.add(m);
 			}
 		}
+		if(v.size() == 0) {
+			return null;
+		}
 		CellCntrMarker currentsmallest = v.get(0);
 		for (int i = 1; i < v.size(); i++) {
 			final CellCntrMarker m2 = v.get(i);
