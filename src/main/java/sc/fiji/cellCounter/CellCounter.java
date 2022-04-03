@@ -206,15 +206,22 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 		gbc.ipadx = 5;
 		gb.setConstraints(dynPanel, gbc);
 		getContentPane().add(dynPanel);
-				
-		dynButtonPanel.add(makeDynRadioButton(1));
-		dynButtonPanel.add(makeDynRadioButton(2));
-		dynButtonPanel.add(makeDynRadioButton(3));
-		dynButtonPanel.add(makeDynRadioButton(4));
-		dynButtonPanel.add(makeDynRadioButton(5));
-		dynButtonPanel.add(makeDynRadioButton(6));
-		dynButtonPanel.add(makeDynRadioButton(7));
-		dynButtonPanel.add(makeDynRadioButton(8));
+
+		JRadioButton btn1 = makeDynRadioButton(1);
+		btn1.setText("Mount Count");
+		dynButtonPanel.add(btn1);
+		JRadioButton btn2 = makeDynRadioButton(2);
+		btn2.setText("Mica count");
+		dynButtonPanel.add(btn2);
+		JRadioButton btn3 = makeDynRadioButton(3);
+		btn3.setText("2d distance");
+		dynButtonPanel.add(btn3);
+		JRadioButton btn4 = makeDynRadioButton(4);
+		btn4.setText("3d distance");
+		dynButtonPanel.add(btn4);
+		JRadioButton btn5 = makeDynRadioButton(5);
+		btn5.setText("ROI Modification");
+		dynButtonPanel.add(btn5);
 
 		// create a "static" panel to hold control buttons
 		statButtonPanel = new JPanel();
