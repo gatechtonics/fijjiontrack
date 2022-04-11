@@ -27,6 +27,7 @@ package sc.fiji.cellCounter;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.ImageCanvas;
+import ij.gui.Overlay;
 import ij.gui.Roi;
 import ij.gui.Toolbar;
 import ij.measure.Calibration;
@@ -56,27 +57,27 @@ public class CellCntrImageCanvas extends ImageCanvas {
 	private final CellCounter cc;
 	private final ImagePlus img;
 	private boolean delmode = false;
+	private boolean roimode = false;
 	private boolean showNumbers = true;
 	private boolean showAll = false;
 	private final Font font = new Font("SansSerif", Font.PLAIN, 10);
 
 	/** Creates a new instance of CellCntrImageCanvas */
-	public CellCntrImageCanvas(final ImagePlus img,
-		final Vector<CellCntrMarkerVector> typeVector, final CellCounter cc,
-		final Vector<Roi> displayList)
+	public CellCntrImageCanvas(final ImagePlus img, final Vector<CellCntrMarkerVector> typeVector,
+							   final CellCounter cc, Overlay displayList)
 	{
 		super(img);
 		this.img = img;
 		this.typeVector = typeVector;
 		this.cc = cc;
-		if (displayList != null) this.setDisplayList(displayList);
+		//if (displayList != null) this.setDisplayList(displayList);
+		if (displayList != null) this.setOverlay(displayList);
 	}
 
 	@Override
 	public void mousePressed(final MouseEvent e) {
 		if (IJ.spaceBarDown() || Toolbar.getToolId() == Toolbar.MAGNIFIER ||
-			Toolbar.getToolId() == Toolbar.HAND)
-		{
+				Toolbar.getToolId() == Toolbar.HAND) {
 			super.mousePressed(e);
 			return;
 		}
@@ -88,35 +89,42 @@ public class CellCntrImageCanvas extends ImageCanvas {
 
 		final int x = super.offScreenX(e.getX());
 		final int y = super.offScreenY(e.getY());
-		if (!delmode) {
-			final CellCntrMarker m = new CellCntrMarker(x, y, img.getCurrentSlice());
-			currentMarkerVector.addMarker(m);
-		}
-		else {
-			Point p = new Point(x, y);
-			CellCntrMarker currentsmallest = currentMarkerVector.getMarkerFromPosition(new Point(x, y), 1);
-			for(int i = 1; i <= img.getStackSize(); i++) {
-				CellCntrMarker m =
-						currentMarkerVector.getMarkerFromPosition(new Point(x, y), i);
-				if(m == null) {
-					continue;
+		Overlay overlay = img.getOverlay();
+		Roi roi = overlay.get(0);
+		if (!roimode) {
+			if (!delmode) {
+				if (!roi.containsPoint(x, y)) {
+					IJ.error("The point is outside of ROI");
+				} else {
+					final CellCntrMarker m = new CellCntrMarker(x, y, img.getCurrentSlice());
+					currentMarkerVector.addMarker(m);
 				}
-				if(currentsmallest == null) {
-					currentsmallest = m;
+			} else {
+				Point p = new Point(x, y);
+				CellCntrMarker currentsmallest = currentMarkerVector.getMarkerFromPosition(new Point(x, y), 1);
+				for (int i = 1; i <= img.getStackSize(); i++) {
+					CellCntrMarker m =
+							currentMarkerVector.getMarkerFromPosition(new Point(x, y), i);
+					if (m == null) {
+						continue;
+					}
+					if (currentsmallest == null) {
+						currentsmallest = m;
+					}
+					final Point p1 =
+							new Point(currentsmallest.getX(), currentsmallest.getY());
+					final Point p2 = new Point(m.getX(), m.getY());
+					final boolean closer =
+							Math.abs(p1.distance(p)) > Math.abs(p2.distance(p));
+					if (closer) {
+						currentsmallest = m;
+					}
 				}
-				final Point p1 =
-						new Point(currentsmallest.getX(), currentsmallest.getY());
-				final Point p2 = new Point(m.getX(), m.getY());
-				final boolean closer =
-						Math.abs(p1.distance(p)) > Math.abs(p2.distance(p));
-				if (closer) {
-					currentsmallest = m;
-				}
+				currentMarkerVector.remove(currentsmallest);
 			}
-			currentMarkerVector.remove(currentsmallest);
+			repaint();
+			cc.populateTxtFields();
 		}
-		repaint();
-		cc.populateTxtFields();
 	}
 
 	@Override
@@ -144,7 +152,14 @@ public class CellCntrImageCanvas extends ImageCanvas {
 
 	@Override
 	public void mouseDragged(final MouseEvent e) {
-		super.mouseDragged(e);
+		if (roimode && !delmode) {
+			Overlay overlay = img.getOverlay();
+			Roi roi = overlay.get(0);
+			roi.setLocation(e.getX(), e.getY());
+			roi.mouseDragged(e);
+		}
+		repaint();
+		cc.populateTxtFields();
 	}
 
 	@Override
@@ -186,7 +201,7 @@ public class CellCntrImageCanvas extends ImageCanvas {
 				}
 				if (typeID >= 3) {
 					if (flag) {
-						g2.drawLine((int)x,(int)y,(int)xM,(int)yM);
+						g2.drawLine((int) x, (int) y, (int) xM, (int) yM);
 						flag = false;
 					} else {
 						x = xM;
@@ -380,9 +395,15 @@ public class CellCntrImageCanvas extends ImageCanvas {
 	public boolean isDelmode() {
 		return delmode;
 	}
+	public boolean isRoimode() {
+		return roimode;
+	}
 
 	public void setDelmode(final boolean delmode) {
 		this.delmode = delmode;
+	}
+	public void setRoimode(final boolean roimode) {
+		this.roimode = roimode;
 	}
 
 	public boolean isShowNumbers() {
