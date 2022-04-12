@@ -272,7 +272,7 @@ public class CellCntrImageCanvas extends ImageCanvas {
 				final ListIterator<CellCntrMarker> mit = mv.listIterator();
 				while (mit.hasNext()) {
 					final CellCntrMarker m = mit.next();
-					if (m.getZ() == i) {
+					if (m.getZ() == i && typeID <= 2) {
 						final int xM = m.getX();
 						final int yM = m.getY();
 						final int zM = m.getZ();
@@ -286,7 +286,7 @@ public class CellCntrImageCanvas extends ImageCanvas {
 						final double yMcal 	= yM * cal.pixelHeight;
 						final double zMcal 	= (zPos-1) * cal.pixelDepth; 		// zPos instead of zM , start at 1 while should start at 0.
 
-						String resultsRow = String.format("%d\t%d\t%d\t%d\t%f\t%d\t%d\t%d\t%.3f\t%.3f\t%.3f",typeID,zM,xM,yM,value,channel,zPos,frame,xMcal,yMcal,zMcal);
+						String resultsRow = String.format("%s\t%d\t%d\t%d\t%f\t%d\t%d\t%d\t%.3f\t%.3f\t%.3f",typeID == 2?"Mica":"Mount",zM,xM,yM,value,channel,zPos,frame,xMcal,yMcal,zMcal);
 						IJ.write(resultsRow);
 						//IJ.write(typeID + "\t" + zM + "\t" + xM + "\t" + yM + "\t" + value + "\t" + channel + "\t" + zPos + "\t" + frame + "\t" + xMcal + "\t" + yMcal + "\t" +zMcal);
 
