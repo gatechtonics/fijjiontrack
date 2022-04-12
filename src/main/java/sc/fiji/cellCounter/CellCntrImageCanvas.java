@@ -184,7 +184,7 @@ public class CellCntrImageCanvas extends ImageCanvas {
 					if (showNumbers) g2.drawString(Integer.toString(typeID),
 							(int) xM + 3, (int) yM - 3);
 				}
-				if (typeID == 3) {
+				if (typeID >= 3) {
 					if (flag) {
 						g2.drawLine((int)x,(int)y,(int)xM,(int)yM);
 						flag = false;
