@@ -90,6 +90,7 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 	private static final String LOADMARKERS = "Load Markers";
 	private static final String EXPORTIMG = "Export Image";
 	private static final String MEASURE = "Measure...";
+	private static final String MEASURE2 = "Measure Distances";
 
 	private static final String TYPE_COMMAND_PREFIX = "type";
 
@@ -129,6 +130,7 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 	private JButton loadButton;
 	private JButton exportimgButton;
 	private JButton measureButton;
+	private JButton measure2Button;
 
 	private boolean keepOriginal = false;
 
@@ -481,6 +483,12 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 		gb.setConstraints(measureButton, gbc);
 		statButtonPanel.add(measureButton);
 
+		measure2Button =
+				makeButton(MEASURE2, "Measure pixel intensity of marker points");
+		measure2Button.setEnabled(false);
+		gb.setConstraints(measure2Button, gbc);
+		statButtonPanel.add(measure2Button);
+
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.fill = GridBagConstraints.NONE;
@@ -617,6 +625,7 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 		exportButton.setEnabled(true);
 		exportimgButton.setEnabled(true);
 		measureButton.setEnabled(true);
+		measure2Button.setEnabled(true);
 	}
 
 	void validateLayout() {
@@ -712,6 +721,8 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 		}
 		else if (command.equals(MEASURE)) {
 			measure();
+		} else if (command.equals(MEASURE2)) {
+			measure2();
 		}
 		if (ic != null) ic.repaint();
 		populateTxtFields();
@@ -759,7 +770,11 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 		ic.measure();
 	}
 
-	public void reset() {
+	public void measure2() {
+		ic.measure2();
+	}
+
+ 	public void reset() {
 		if (typeVector.size() < 1) {
 			return;
 		}

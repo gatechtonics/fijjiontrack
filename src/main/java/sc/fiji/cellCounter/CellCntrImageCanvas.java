@@ -255,6 +255,48 @@ public class CellCntrImageCanvas extends ImageCanvas {
 	}
 
 	public void measure() {
+		Calibration cal = img.getCalibration();
+		String unit = cal.getUnit();
+		String columnHeadings = String.format("Type\tSlice\tX\tY\tValue\tC-pos\tZ-pos\tT-pos\tX(%s)\tY(%s)\tZ(%s)",unit,unit,unit);
+		IJ.setColumnHeadings(columnHeadings);
+
+
+		for (int i = 1; i <= img.getStackSize(); i++) {
+			img.setSlice(i);
+			final ImageProcessor ip = img.getProcessor();
+
+			final ListIterator<CellCntrMarkerVector> it = typeVector.listIterator();
+			while (it.hasNext()) {
+				final CellCntrMarkerVector mv = it.next();
+				final int typeID = mv.getType();
+				final ListIterator<CellCntrMarker> mit = mv.listIterator();
+				while (mit.hasNext()) {
+					final CellCntrMarker m = mit.next();
+					if (m.getZ() == i) {
+						final int xM = m.getX();
+						final int yM = m.getY();
+						final int zM = m.getZ();
+						final double value = ip.getPixelValue(xM, yM);
+
+						int[] realPosArray = img.convertIndexToPosition(zM); // from the slice we get the array  [channel, slice, frame]
+						final int channel 	= realPosArray[0];
+						final int zPos		= realPosArray[1];
+						final int frame 	= realPosArray[2];
+						final double xMcal 	= xM * cal.pixelWidth ;
+						final double yMcal 	= yM * cal.pixelHeight;
+						final double zMcal 	= (zPos-1) * cal.pixelDepth; 		// zPos instead of zM , start at 1 while should start at 0.
+
+						String resultsRow = String.format("%d\t%d\t%d\t%d\t%f\t%d\t%d\t%d\t%.3f\t%.3f\t%.3f",typeID,zM,xM,yM,value,channel,zPos,frame,xMcal,yMcal,zMcal);
+						IJ.write(resultsRow);
+						//IJ.write(typeID + "\t" + zM + "\t" + xM + "\t" + yM + "\t" + value + "\t" + channel + "\t" + zPos + "\t" + frame + "\t" + xMcal + "\t" + yMcal + "\t" +zMcal);
+
+					}
+				}
+			}
+		}
+	}
+
+	public void measure2() {
 		Calibration cal = img.getCalibration();	
 		String unit = cal.getUnit();
 		String columnHeadings = String.format("Type\tDistance\tX(%s)\tY(%s)\tZ(%s)",unit,unit,unit);
@@ -315,6 +357,7 @@ public class CellCntrImageCanvas extends ImageCanvas {
 			}
 		}
 	}
+
 
 	public Vector<CellCntrMarkerVector> getTypeVector() {
 		return typeVector;
