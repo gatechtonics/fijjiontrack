@@ -28,7 +28,6 @@ import ij.ImagePlus;
 import ij.ImageStack;
 import ij.WindowManager;
 import ij.gui.ImageWindow;
-import ij.gui.Overlay;
 import ij.gui.Roi;
 import ij.gui.StackWindow;
 import ij.measure.Calibration;
@@ -92,8 +91,6 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 	private static final String EXPORTIMG = "Export Image";
 	private static final String MEASURE = "Measure...";
 	private static final String MEASURE2 = "Measure Distances";
-	private static final String ROIMODIFY = "Drag ROI";
-
 
 	private static final String TYPE_COMMAND_PREFIX = "type";
 
@@ -115,7 +112,6 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 	private JPanel autoButtonPanel;
 	private JPanel dynTxtPanel;
 	private JCheckBox delCheck;
-	private JCheckBox roiCheck;
 	private JCheckBox newCheck;
 	private JCheckBox numbersCheck;
 	private JCheckBox showAllCheck;
@@ -258,9 +254,9 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 		JRadioButton btn4 = makeDynRadioButton(4);
 		btn4.setText("3d distance");
 		dynButtonPanel.add(btn4);
-//		JRadioButton btn5 = makeDynRadioButton(5);
-//		btn5.setText("ROI Modification");
-//		dynButtonPanel.add(btn5);
+		JRadioButton btn5 = makeDynRadioButton(5);
+		btn5.setText("ROI Modification");
+		dynButtonPanel.add(btn5);
 
 		// create a "static" panel to hold control buttons
 		statButtonPanel = new JPanel();
@@ -361,14 +357,6 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 		delCheck.setEnabled(false);
 		gb.setConstraints(delCheck, gbc);
 		statButtonPanel.add(delCheck);
-
-		roiCheck = new JCheckBox(ROIMODIFY);
-		roiCheck.setToolTipText("When selected\nyou can move roi");
-		roiCheck.setSelected(false);
-		roiCheck.addItemListener(this);
-		roiCheck.setEnabled(false);
-		gb.setConstraints(roiCheck, gbc);
-		statButtonPanel.add(roiCheck);
 
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -573,21 +561,14 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 			
 			
 			ImageProcessor ip = img.getProcessor();
-			//ip.resetRoi();
+			ip.resetRoi();
 			
 			if (keepOriginal) ip = ip.crop();
-			//if(true) ip = ip.crop();
 			counterImg = new ImagePlus("Counter Window - " + img.getTitle(), ip);
 			
 			@SuppressWarnings("unchecked")
-			Overlay displayList;
-			if (v139t) {
-				displayList = new Overlay();
-				displayList.add(img.getRoi());
-			}
-			else{
-				displayList = null;
-			}
+			final Vector<Roi> displayList =
+				v139t ? img.getCanvas().getDisplayList() : null;
 			ic = new CellCntrImageCanvas(counterImg, typeVector, this, displayList);
 			new ImageWindow(counterImg, ic);
 		}
@@ -612,15 +593,8 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 			}
 			counterImg.setOpenAsHyperStack(img.isHyperStack());
 			@SuppressWarnings("unchecked")
-			Overlay displayList;
-			if (v139t) {
-				displayList = new Overlay();
-				displayList.add(img.getRoi());
-
-			}
-			else{
-				displayList = null;
-			}
+			final Vector<Roi> displayList =
+				v139t ? img.getCanvas().getDisplayList() : null;
 			ic = new CellCntrImageCanvas(counterImg, typeVector, this, displayList);
 			new StackWindow(counterImg, ic);
 		}
@@ -639,7 +613,6 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 			img.close();
 		}
 		delCheck.setEnabled(true);
-		roiCheck.setEnabled(true);
 		numbersCheck.setEnabled(true);
 		showAllCheck.setSelected(false);
 		if (counterImg.getStackSize() > 1) showAllCheck.setEnabled(true);
@@ -763,14 +736,6 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 			}
 			else {
 				ic.setDelmode(false);
-			}
-		}
-		else if(e.getItem().equals(roiCheck)) {
-			if (e.getStateChange() == ItemEvent.SELECTED) {
-				ic.setRoimode(true);
-			}
-			else {
-				ic.setRoimode(false);
 			}
 		}
 		else if (e.getItem().equals(newCheck)) {
