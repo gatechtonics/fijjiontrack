@@ -26,21 +26,14 @@ package sc.fiji.cellCounter;
 
 import ij.IJ;
 import ij.ImagePlus;
-import ij.gui.ImageCanvas;
-import ij.gui.Roi;
-import ij.gui.Toolbar;
+import ij.gui.*;
 import ij.measure.Calibration;
 import ij.process.ImageProcessor;
 
-import java.awt.BasicStroke;
-import java.awt.Cursor;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.Rectangle;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Line2D;
 import java.util.ListIterator;
 import java.util.Vector;
 
@@ -59,6 +52,10 @@ public class CellCntrImageCanvas extends ImageCanvas {
 	private boolean showNumbers = true;
 	private boolean showAll = false;
 	private final Font font = new Font("SansSerif", Font.PLAIN, 10);
+	private Line line;
+	private int x1,x2,y1,y2;
+	private Arrow arrow;
+	private Line2D line2d;
 
 	/** Creates a new instance of CellCntrImageCanvas */
 	public CellCntrImageCanvas(final ImagePlus img,
@@ -86,6 +83,10 @@ public class CellCntrImageCanvas extends ImageCanvas {
 			return;
 		}
 
+		arrow = new Arrow(e.getX(), e.getY(), img);
+		line = new Line(e.getX(), e.getY(), img);
+		x1 = e.getX();
+		y1 = e.getY();
 		final int x = super.offScreenX(e.getX());
 		final int y = super.offScreenY(e.getY());
 		if (!delmode) {
@@ -121,11 +122,13 @@ public class CellCntrImageCanvas extends ImageCanvas {
 
 	@Override
 	public void mouseReleased(final MouseEvent e) {
-		super.mouseReleased(e);
+		line.draw(getGraphics());
+		//super.mouseReleased(e);
 	}
 
 	@Override
 	public void mouseMoved(final MouseEvent e) {
+		//line.mouseMoved(e);
 		super.mouseMoved(e);
 	}
 
@@ -144,13 +147,32 @@ public class CellCntrImageCanvas extends ImageCanvas {
 
 	@Override
 	public void mouseDragged(final MouseEvent e) {
-		super.mouseDragged(e);
+		//super.mouseDragged(e);
+		//line.draw(getGraphics());
+
+		line.mouseDragged(e);
+		img.getProcessor().draw(line);
+		//img.getProcessor().lineTo(e.getX(),e.getY());
+		//img.updateAndDraw();
+		img.getProcessor().setColor(Color.yellow);
+//		x2 = e.getX();
+//		y2 = e.getY();
+//		line.x2d = x2;
+//		line.y2d = y2;
+		//imp.draw(line.x1, line.y1, line.x2, line.y2);
+		System.out.println(line.getLength());
+		//line.draw(getGraphics());
+		line.drawOverlay(getGraphics());
+		//arrow.draw(getGraphics());
+
+
 	}
 
 	@Override
 	public void mouseClicked(final MouseEvent e) {
 		super.mouseClicked(e);
 	}
+
 
 	private Rectangle srcRect = new Rectangle(0, 0, 0, 0);
 
