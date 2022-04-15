@@ -186,6 +186,9 @@ public class CellCntrImageCanvas extends ImageCanvas {
 			final int typeID = mv.getType();
 			g2.setColor(mv.getColor());
 			final ListIterator<CellCntrMarker> mit = mv.listIterator();
+			boolean flag = false;
+			double x = 0;
+			double y = 0;
 			while (mit.hasNext()) {
 				final CellCntrMarker m = mit.next();
 				xM = ((m.getX() - srcRect.x) * magnification);
@@ -194,9 +197,20 @@ public class CellCntrImageCanvas extends ImageCanvas {
 				g2.drawOval((int) xM - 2, (int) yM - 2, 4, 4);
 				if (showNumbers) g2.drawString(Integer.toString(typeID),
 							(int) xM + 3, (int) yM - 3);
-			}
-		}
-	}
+				}
+				if (typeID >= 3) {
+					if (flag) {
+						g2.drawLine((int)x,(int)y,(int)xM,(int)yM);
+						flag = false;
+					} else {
+						x = xM;
+						y = yM;
+						flag = true;
+					}
+				}
+    }
+  }
+
 
 	public void removeLastMarker() {
 		currentMarkerVector.removeLastMarker();
@@ -255,9 +269,51 @@ public class CellCntrImageCanvas extends ImageCanvas {
 	}
 
 	public void measure() {
-		Calibration cal = img.getCalibration();	
+		Calibration cal = img.getCalibration();
 		String unit = cal.getUnit();
 		String columnHeadings = String.format("Type\tSlice\tX\tY\tValue\tC-pos\tZ-pos\tT-pos\tX(%s)\tY(%s)\tZ(%s)",unit,unit,unit);
+		IJ.setColumnHeadings(columnHeadings);
+
+
+		for (int i = 1; i <= img.getStackSize(); i++) {
+			img.setSlice(i);
+			final ImageProcessor ip = img.getProcessor();
+
+			final ListIterator<CellCntrMarkerVector> it = typeVector.listIterator();
+			while (it.hasNext()) {
+				final CellCntrMarkerVector mv = it.next();
+				final int typeID = mv.getType();
+				final ListIterator<CellCntrMarker> mit = mv.listIterator();
+				while (mit.hasNext()) {
+					final CellCntrMarker m = mit.next();
+					if (m.getZ() == i && typeID <= 2) {
+						final int xM = m.getX();
+						final int yM = m.getY();
+						final int zM = m.getZ();
+						final double value = ip.getPixelValue(xM, yM);
+
+						int[] realPosArray = img.convertIndexToPosition(zM); // from the slice we get the array  [channel, slice, frame]
+						final int channel 	= realPosArray[0];
+						final int zPos		= realPosArray[1];
+						final int frame 	= realPosArray[2];
+						final double xMcal 	= xM * cal.pixelWidth ;
+						final double yMcal 	= yM * cal.pixelHeight;
+						final double zMcal 	= (zPos-1) * cal.pixelDepth; 		// zPos instead of zM , start at 1 while should start at 0.
+
+						String resultsRow = String.format("%s\t%d\t%d\t%d\t%f\t%d\t%d\t%d\t%.3f\t%.3f\t%.3f",typeID == 2?"Mica":"Mount",zM,xM,yM,value,channel,zPos,frame,xMcal,yMcal,zMcal);
+						IJ.write(resultsRow);
+						//IJ.write(typeID + "\t" + zM + "\t" + xM + "\t" + yM + "\t" + value + "\t" + channel + "\t" + zPos + "\t" + frame + "\t" + xMcal + "\t" + yMcal + "\t" +zMcal);
+
+					}
+				}
+			}
+		}
+	}
+
+	public void measure2() {
+		Calibration cal = img.getCalibration();	
+		String unit = cal.getUnit();
+		String columnHeadings = String.format("Type\tDistance\tX(%s)\tY(%s)\tZ(%s)",unit,unit,unit);
 		IJ.setColumnHeadings(columnHeadings);
 		
 		
@@ -266,11 +322,19 @@ public class CellCntrImageCanvas extends ImageCanvas {
 			final ImageProcessor ip = img.getProcessor();
 			
 			final ListIterator<CellCntrMarkerVector> it = typeVector.listIterator();
+			it.next();
+			it.next();
 			while (it.hasNext()) {
 				final CellCntrMarkerVector mv = it.next();
 				final int typeID = mv.getType();
+				System.out.println(typeID);
 				final ListIterator<CellCntrMarker> mit = mv.listIterator();
+				boolean flag = false;
+				double x = 0;
+				double y = 0;
+				double z = 0;
 				while (mit.hasNext()) {
+					String type = typeID == 3 ? "2D": "3D";
 					final CellCntrMarker m = mit.next();
 					if (m.getZ() == i) {
 						final int xM = m.getX();
@@ -284,10 +348,22 @@ public class CellCntrImageCanvas extends ImageCanvas {
 						final int frame 	= realPosArray[2];
 						final double xMcal 	= xM * cal.pixelWidth ;
 						final double yMcal 	= yM * cal.pixelHeight;
-						final double zMcal 	= (zPos-1) * cal.pixelDepth; 		// zPos instead of zM , start at 1 while should start at 0.  
-						
-						String resultsRow = String.format("%d\t%d\t%d\t%d\t%f\t%d\t%d\t%d\t%.3f\t%.3f\t%.3f",typeID,zM,xM,yM,value,channel,zPos,frame,xMcal,yMcal,zMcal);
-						IJ.write(resultsRow);
+						final double zMcal 	= (zPos-1) * cal.pixelDepth; 		// zPos instead of zM , start at 1 while should start at 0.
+						if (flag) {
+							flag = false;
+							double temp = Math.pow(xMcal - x, 2) + Math.pow(yMcal - y,2);
+							double distance = Math.sqrt(type == "2D" ? temp: temp + Math.pow(zMcal - z, 2));
+							String resultsRow = String.format("%s\t%.3f\t%.3f\t%.3f\t%.3f",type,distance,xMcal,yMcal,zMcal);
+							IJ.write(resultsRow);
+						} else {
+							flag = true;
+							x = xMcal;
+							y = yMcal;
+							z = zMcal;
+						}
+
+//						String resultsRow = String.format("%s\t%.3f\t%.3f\t%.3f\t%.3f",type,distance,xMcal,yMcal,zMcal);
+//						IJ.write(resultsRow);
 						//IJ.write(typeID + "\t" + zM + "\t" + xM + "\t" + yM + "\t" + value + "\t" + channel + "\t" + zPos + "\t" + frame + "\t" + xMcal + "\t" + yMcal + "\t" +zMcal);
 						
 					}
@@ -295,6 +371,7 @@ public class CellCntrImageCanvas extends ImageCanvas {
 			}
 		}
 	}
+
 
 	public Vector<CellCntrMarkerVector> getTypeVector() {
 		return typeVector;
