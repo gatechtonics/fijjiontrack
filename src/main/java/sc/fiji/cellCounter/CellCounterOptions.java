@@ -44,16 +44,16 @@ public class CellCounterOptions extends OptionsPlugin {
 	// -- Fields --
 
 	@Parameter
-	private ColorRGB color1 = Colors.BLUE;
+	private ColorRGB color1 = Colors.CYAN;
 
 	@Parameter
-	private ColorRGB color2 = Colors.CYAN;
+	private ColorRGB color2 = Colors.RED;
 
 	@Parameter
-	private ColorRGB color3 = Colors.GREEN;
+	private ColorRGB color3 = Colors.ROYALBLUE;
 
 	@Parameter
-	private ColorRGB color4 = Colors.MAGENTA;
+	private ColorRGB color4 = Colors.LIGHTGREEN;
 
 	@Parameter
 	private ColorRGB color5 = Colors.ORANGE;
@@ -72,13 +72,13 @@ public class CellCounterOptions extends OptionsPlugin {
 	public Color getColor(final int id) {
 		switch (id) {
 			case 1:
-				return AWTColors.getColor(color1);
+				return AWTColors.getColor(Colors.CYAN);
 			case 2:
-				return AWTColors.getColor(color2);
+				return AWTColors.getColor(Colors.RED);
 			case 3:
-				return AWTColors.getColor(color3);
+				return AWTColors.getColor(Colors.ROYALBLUE);
 			case 4:
-				return AWTColors.getColor(color4);
+				return AWTColors.getColor(Colors.LIGHTGREEN);
 			case 5:
 				return AWTColors.getColor(color5);
 			case 6:
