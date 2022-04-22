@@ -93,7 +93,7 @@ public class CellCntrImageCanvas extends ImageCanvas {
 		Roi roi = overlay.get(0);
 		if (!roimode) {
 			if (!delmode) {
-				if (!roi.containsPoint(x, y)) {
+				if (roi!=null && !roi.containsPoint(x, y)) {
 					IJ.error("The point is outside of ROI");
 				} else {
 					final CellCntrMarker m = new CellCntrMarker(x, y, img.getCurrentSlice());
@@ -194,10 +194,7 @@ public class CellCntrImageCanvas extends ImageCanvas {
 				if (true || showAll) {
 					xM = ((m.getX() - srcRect.x) * magnification);
 					yM = ((m.getY() - srcRect.y) * magnification);
-					g2.fillOval((int) xM - 2, (int) yM - 2, 4, 4);
-					g2.drawOval((int) xM - 2, (int) yM - 2, 4, 4);
-					if (showNumbers) g2.drawString(Integer.toString(typeID),
-							(int) xM + 3, (int) yM - 3);
+
 				}
 				if (typeID >= 3) {
 					if (flag) {
@@ -208,6 +205,14 @@ public class CellCntrImageCanvas extends ImageCanvas {
 						y = yM;
 						flag = true;
 					}
+					g2.fillOval((int) xM , (int) yM, 1, 1);
+					g2.drawOval((int) xM , (int) yM, 1, 1);
+				}
+				else{
+					g2.fillOval((int) xM - 2, (int) yM - 2, 4, 4);
+					g2.drawOval((int) xM - 2, (int) yM - 2, 4, 4);
+					if (showNumbers) g2.drawString(Integer.toString(typeID),
+							(int) xM + 3, (int) yM - 3);
 				}
 			}
 		}
