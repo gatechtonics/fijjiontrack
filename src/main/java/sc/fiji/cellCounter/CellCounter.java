@@ -179,13 +179,12 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		final GridBagLayout gb = new GridBagLayout();
 		getContentPane().setLayout(gb);
-
 		radioGrp = new ButtonGroup();// to group the radiobuttons
 
 		autoButtonGrp = new ButtonGroup();
 
-		dynGrid = new GridLayout(8, 1);
-		dynGrid.setVgap(2);
+		dynGrid = new GridLayout(4, 1);
+		//dynGrid.setVgap(2);
 
 		//This panel is for automatic counting buttons
 		autoPanel = new JPanel();
@@ -201,7 +200,7 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 		GridBagConstraints gbc1 = new GridBagConstraints();
 		gbc1.anchor = GridBagConstraints.NORTHWEST;
 		gbc1.fill = GridBagConstraints.BOTH;
-		gbc1.ipadx = 5;
+		gbc1.ipadx = 0;
 		gbc1.gridy = 1;
 		gb.setConstraints(autoPanel, gbc1);
 		autoPanel.add(autoButtonPanel);
@@ -215,7 +214,7 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 
 		// this panel will keep the dynamic GUI parts
 		dynPanel = new JPanel();
-		dynPanel.setBorder(BorderFactory.createTitledBorder("Counters"));
+		dynPanel.setBorder(BorderFactory.createTitledBorder("Manuel"));
 		dynPanel.setLayout(gb);
 
 		// this panel keeps the radiobuttons
@@ -225,7 +224,7 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.fill = GridBagConstraints.BOTH;
-		gbc.ipadx = 5;
+		gbc.ipadx = 10;
 		gb.setConstraints(dynButtonPanel, gbc);
 		dynPanel.add(dynButtonPanel);
 
@@ -502,13 +501,17 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 		statButtonPanel.add(measure2Button);
 
 		gbc = new GridBagConstraints();
-		gbc.anchor = GridBagConstraints.NORTHWEST;
-		gbc.fill = GridBagConstraints.NONE;
+		//gbc.anchor = GridBagConstraints.NORTHWEST;
+		//gbc.fill = GridBagConstraints.NONE;
 		gbc.ipadx = 5;
+		gbc.gridx = 0;
+		gbc.gridy = 3;
 		gb.setConstraints(statButtonPanel, gbc);
 		getContentPane().add(statButtonPanel);
 
 		final Runnable runner = new GUIShower(this);
+		setSize(new Dimension(10000, 50));
+		setResizable(true);
 		EventQueue.invokeLater(runner);
 	}
 
