@@ -34,13 +34,7 @@ import ij.gui.StackWindow;
 import ij.measure.Calibration;
 import ij.process.ImageProcessor;
 
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.FileDialog;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -583,7 +577,9 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 			Overlay displayList;
 			if (v139t) {
 				displayList = new Overlay();
-				displayList.add(img.getRoi());
+				Roi roi = img.getRoi();
+				displayList.add(roi);
+				displayList.setStrokeColor(Color.white);
 			}
 			else{
 				displayList = null;
@@ -615,7 +611,9 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 			Overlay displayList;
 			if (v139t) {
 				displayList = new Overlay();
-				displayList.add(img.getRoi());
+				Roi roi = img.getRoi();
+				displayList.add(roi);
+				displayList.setStrokeColor(Color.white);
 
 			}
 			else{
