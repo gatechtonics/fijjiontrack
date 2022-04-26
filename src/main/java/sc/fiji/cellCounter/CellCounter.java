@@ -581,10 +581,9 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 			if (v139t) {
 				displayList = new Overlay();
 				Roi roi = img.getRoi();
-				if(roi != null) {
-					roi.setStrokeColor(Color.white);
-				}
+
 				displayList.add(roi);
+				displayList.setStrokeColor(Color.white);
 			}
 			else{
 				displayList = null;
@@ -616,7 +615,9 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 			Overlay displayList;
 			if (v139t) {
 				displayList = new Overlay();
-				displayList.add(img.getRoi());
+				Roi roi = img.getRoi();
+				displayList.add(roi);
+				displayList.setStrokeColor(Color.white);
 
 			}
 			else{
