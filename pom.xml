@@ -10,13 +10,13 @@
 	</parent>
 
 	<groupId>sc.fiji</groupId>
-	<artifactId>Cell_Counter</artifactId>
-	<version>3.0.1-SNAPSHOT</version>
+	<artifactId>Fission_Track_Counter</artifactId>
+	<version>1.0.1</version>
 
-	<name>Cell Counter</name>
-	<description>Cell Counter plugin for ImageJ.</description>
-	<url>https://imagej.net/Cell_Counter</url>
-	<inceptionYear>2001</inceptionYear>
+	<name>Fission Track Counter</name>
+	<description>Fission Track Counter plugin for ImageJ.</description>
+	<url>https://imagej.net/Fission_Track_Counter</url>
+	<inceptionYear>2022</inceptionYear>
 	<organization>
 		<name>Fiji</name>
 		<url>https://fiji.sc/</url>
@@ -44,21 +44,13 @@
 	</developers>
 	<contributors>
 		<contributor>
-			<name>Kurt De Vos</name>
-			<roles><role>founder</role></roles>
+			<name>Ziya Ye</name>
+			<url>https://github.com/zye300</url>
+<!--			<roles><role></role></roles>-->
 		</contributor>
 		<contributor>
 			<name>Romain Guiet</name>
 			<properties><id>romainGuiet</id></properties>
-		</contributor>
-		<contributor>
-			<name>Mark Hiner</name>
-			<url>https://imagej.net/User:Hinerm</url>
-			<properties><id>hinerm</id></properties>
-		</contributor>
-		<contributor>
-			<name>Tim Wheeler</name>
-			<properties><id>twheele3</id></properties>
 		</contributor>
 	</contributors>
 
@@ -70,22 +62,22 @@
 	</mailingLists>
 
 	<scm>
-		<connection>scm:git:https://github.com/fiji/Cell_Counter</connection>
+		<connection>scm:git:https://github.com/gatechtonics/fijjiontrack</connection>
 		<developerConnection>scm:git:git@github.com:fiji/Cell_Counter</developerConnection>
 		<tag>HEAD</tag>
-		<url>https://github.com/fiji/Cell_Counter</url>
+		<url>https://github.com/gatechtonics/fijjiontrack/</url>
 	</scm>
 	<issueManagement>
 		<system>GitHub Issues</system>
-		<url>https://github.com/fiji/Cell_Counter/issues</url>
+		<url>https://github.com/gatechtonics/fijjiontrack/</url>
 	</issueManagement>
 	<ciManagement>
 		<system>GitHub Actions</system>
-		<url>https://github.com/fiji/Cell_Counter/actions</url>
+		<url>https://github.com/gatechtonics/fijjiontrack</url>
 	</ciManagement>
 
 	<properties>
-		<package-name>sc.fiji.cellCounter</package-name>
+		<package-name>sc.fiji.fissionTrackCounter</package-name>
 
 		<license.licenseName>gpl_v3</license.licenseName>
 		<license.copyrightOwners>Fiji developers.</license.copyrightOwners>
