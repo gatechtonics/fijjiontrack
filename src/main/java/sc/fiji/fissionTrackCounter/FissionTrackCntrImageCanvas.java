@@ -22,7 +22,7 @@
 
 // Created on November 22, 2005, 5:58 PM
 
-package sc.fiji.cellCounter;
+package sc.fiji.fissionTrackCounter;
 
 import ij.IJ;
 import ij.ImagePlus;
@@ -50,11 +50,11 @@ import java.util.Vector;
  *
  * @author Kurt De Vos
  */
-public class CellCntrImageCanvas extends ImageCanvas {
+public class FissionTrackCntrImageCanvas extends ImageCanvas {
 
-	private Vector<CellCntrMarkerVector> typeVector;
-	private CellCntrMarkerVector currentMarkerVector;
-	private final CellCounter cc;
+	private Vector<FissionTrackCntrMarkerVector> typeVector;
+	private FissionTrackCntrMarkerVector currentMarkerVector;
+	private final FissionTrackCounter cc;
 	private final ImagePlus img;
 	private boolean delmode = false;
 	private boolean roimode = false;
@@ -62,9 +62,9 @@ public class CellCntrImageCanvas extends ImageCanvas {
 	private boolean showAll = false;
 	private final Font font = new Font("SansSerif", Font.PLAIN, 10);
 
-	/** Creates a new instance of CellCntrImageCanvas */
-	public CellCntrImageCanvas(final ImagePlus img, final Vector<CellCntrMarkerVector> typeVector,
-							   final CellCounter cc, Overlay displayList)
+	/** Creates a new instance of FissionTrackCntrImageCanvas */
+	public FissionTrackCntrImageCanvas(final ImagePlus img, final Vector<FissionTrackCntrMarkerVector> typeVector,
+									   final FissionTrackCounter cc, Overlay displayList)
 	{
 		super(img);
 		this.img = img;
@@ -96,14 +96,14 @@ public class CellCntrImageCanvas extends ImageCanvas {
 				if (roi!=null && !roi.containsPoint(x, y)) {
 					IJ.error("The point is outside of ROI");
 				} else {
-					final CellCntrMarker m = new CellCntrMarker(x, y, img.getCurrentSlice());
+					final FissionTrackCntrMarker m = new FissionTrackCntrMarker(x, y, img.getCurrentSlice());
 					currentMarkerVector.addMarker(m);
 				}
 			} else {
 				Point p = new Point(x, y);
-				CellCntrMarker currentsmallest = currentMarkerVector.getMarkerFromPosition(new Point(x, y), 1);
+				FissionTrackCntrMarker currentsmallest = currentMarkerVector.getMarkerFromPosition(new Point(x, y), 1);
 				for (int i = 1; i <= img.getStackSize(); i++) {
-					CellCntrMarker m =
+					FissionTrackCntrMarker m =
 							currentMarkerVector.getMarkerFromPosition(new Point(x, y), i);
 					if (m == null) {
 						continue;
@@ -180,17 +180,17 @@ public class CellCntrImageCanvas extends ImageCanvas {
 		g2.setStroke(new BasicStroke(1f));
 		g2.setFont(font);
 
-		final ListIterator<CellCntrMarkerVector> it = typeVector.listIterator();
+		final ListIterator<FissionTrackCntrMarkerVector> it = typeVector.listIterator();
 		while (it.hasNext()) {
-			final CellCntrMarkerVector mv = it.next();
+			final FissionTrackCntrMarkerVector mv = it.next();
 			final int typeID = mv.getType();
 			g2.setColor(mv.getColor());
-			final ListIterator<CellCntrMarker> mit = mv.listIterator();
+			final ListIterator<FissionTrackCntrMarker> mit = mv.listIterator();
 			boolean flag = false;
 			double x = 0;
 			double y = 0;
 			while (mit.hasNext()) {
-				final CellCntrMarker m = mit.next();
+				final FissionTrackCntrMarker m = mit.next();
 				if (true || showAll) {
 					xM = ((m.getX() - srcRect.x) * magnification);
 					yM = ((m.getY() - srcRect.y) * magnification);
@@ -246,14 +246,14 @@ public class CellCntrImageCanvas extends ImageCanvas {
 		final Graphics2D g2r = (Graphics2D) gr;
 		g2r.setStroke(new BasicStroke(1f));
 
-		final ListIterator<CellCntrMarkerVector> it = typeVector.listIterator();
+		final ListIterator<FissionTrackCntrMarkerVector> it = typeVector.listIterator();
 		while (it.hasNext()) {
-			final CellCntrMarkerVector mv = it.next();
+			final FissionTrackCntrMarkerVector mv = it.next();
 			final int typeID = mv.getType();
 			g2r.setColor(mv.getColor());
-			final ListIterator<CellCntrMarker> mit = mv.listIterator();
+			final ListIterator<FissionTrackCntrMarker> mit = mv.listIterator();
 			while (mit.hasNext()) {
-				final CellCntrMarker m = mit.next();
+				final FissionTrackCntrMarker m = mit.next();
 				if (m.getZ() == img.getCurrentSlice()) {
 					xM = m.getX();
 					yM = m.getY();
@@ -285,13 +285,13 @@ public class CellCntrImageCanvas extends ImageCanvas {
 			img.setSlice(i);
 			final ImageProcessor ip = img.getProcessor();
 
-			final ListIterator<CellCntrMarkerVector> it = typeVector.listIterator();
+			final ListIterator<FissionTrackCntrMarkerVector> it = typeVector.listIterator();
 			while (it.hasNext()) {
-				final CellCntrMarkerVector mv = it.next();
+				final FissionTrackCntrMarkerVector mv = it.next();
 				final int typeID = mv.getType();
-				final ListIterator<CellCntrMarker> mit = mv.listIterator();
+				final ListIterator<FissionTrackCntrMarker> mit = mv.listIterator();
 				while (mit.hasNext()) {
-					final CellCntrMarker m = mit.next();
+					final FissionTrackCntrMarker m = mit.next();
 					if (m.getZ() == i && typeID <= 2) {
 						final int xM = m.getX();
 						final int yM = m.getY();
@@ -327,21 +327,21 @@ public class CellCntrImageCanvas extends ImageCanvas {
 			img.setSlice(i);
 			final ImageProcessor ip = img.getProcessor();
 			
-			final ListIterator<CellCntrMarkerVector> it = typeVector.listIterator();
+			final ListIterator<FissionTrackCntrMarkerVector> it = typeVector.listIterator();
 			it.next();
 			it.next();
 			while (it.hasNext()) {
-				final CellCntrMarkerVector mv = it.next();
+				final FissionTrackCntrMarkerVector mv = it.next();
 				final int typeID = mv.getType();
 				System.out.println(typeID);
-				final ListIterator<CellCntrMarker> mit = mv.listIterator();
+				final ListIterator<FissionTrackCntrMarker> mit = mv.listIterator();
 				boolean flag = false;
 				double x = 0;
 				double y = 0;
 				double z = 0;
 				while (mit.hasNext()) {
 					String type = typeID == 3 ? "2D": "3D";
-					final CellCntrMarker m = mit.next();
+					final FissionTrackCntrMarker m = mit.next();
 					if (m.getZ() == i) {
 						final int xM = m.getX();
 						final int yM = m.getY();
@@ -379,20 +379,20 @@ public class CellCntrImageCanvas extends ImageCanvas {
 	}
 
 
-	public Vector<CellCntrMarkerVector> getTypeVector() {
+	public Vector<FissionTrackCntrMarkerVector> getTypeVector() {
 		return typeVector;
 	}
 
-	public void setTypeVector(final Vector<CellCntrMarkerVector> typeVector) {
+	public void setTypeVector(final Vector<FissionTrackCntrMarkerVector> typeVector) {
 		this.typeVector = typeVector;
 	}
 
-	public CellCntrMarkerVector getCurrentMarkerVector() {
+	public FissionTrackCntrMarkerVector getCurrentMarkerVector() {
 		return currentMarkerVector;
 	}
 
 	public void setCurrentMarkerVector(
-		final CellCntrMarkerVector currentMarkerVector)
+		final FissionTrackCntrMarkerVector currentMarkerVector)
 	{
 		this.currentMarkerVector = currentMarkerVector;
 	}

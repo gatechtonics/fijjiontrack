@@ -20,7 +20,7 @@
  * #L%
  */
 
-package sc.fiji.cellCounter;
+package sc.fiji.fissionTrackCounter;
 
 import ij.CompositeImage;
 import ij.IJ;
@@ -57,7 +57,6 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.EtchedBorder;
 
-import javafx.scene.layout.GridPane;
 import org.scijava.Context;
 import org.scijava.command.CommandService;
 
@@ -66,7 +65,7 @@ import org.scijava.command.CommandService;
  *
  * @author Kurt De Vos
  */
-public class CellCounter extends JFrame implements ActionListener, ItemListener
+public class FissionTrackCounter extends JFrame implements ActionListener, ItemListener
 {
 
 	private static final String ADD = "Add";
@@ -91,11 +90,11 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 
 	private static final String TYPE_COMMAND_PREFIX = "type";
 
-	private Vector<CellCntrMarkerVector> typeVector;
+	private Vector<FissionTrackCntrMarkerVector> typeVector;
 	private Vector<JRadioButton> dynRadioVector;
 	private final Vector<JTextField> txtFieldVector;
-	private CellCntrMarkerVector markerVector;
-	private CellCntrMarkerVector currentMarkerVector;
+	private FissionTrackCntrMarkerVector markerVector;
+	private FissionTrackCntrMarkerVector currentMarkerVector;
 	private int currentMarkerIndex;
 		
 	// Map<key,value> for storing metadata to write with WriteXML
@@ -132,19 +131,19 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 
 	private boolean keepOriginal = false;
 
-	private CellCntrImageCanvas ic;
+	private FissionTrackCntrImageCanvas ic;
 
 	private ImagePlus img;
 	private ImagePlus counterImg;
 
 	private GridLayout dynGrid;
 
-	static CellCounter instance;
+	static FissionTrackCounter instance;
 
-	public CellCounter() {
+	public FissionTrackCounter() {
 		super("Fijjiontrack");
 		setResizable(false);
-		typeVector = new Vector<CellCntrMarkerVector>();
+		typeVector = new Vector<FissionTrackCntrMarkerVector>();
 		txtFieldVector = new Vector<JTextField>();
 		dynRadioVector = new Vector<JRadioButton>();
 		initGUI();
@@ -520,11 +519,11 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 	}
 
 	void populateTxtFields() {
-		final ListIterator<CellCntrMarkerVector> it = typeVector.listIterator();
+		final ListIterator<FissionTrackCntrMarkerVector> it = typeVector.listIterator();
 		while (it.hasNext()) {
 			final int index = it.nextIndex();
 			if (txtFieldVector.size() > index) {
-				final CellCntrMarkerVector markerVector = it.next();
+				final FissionTrackCntrMarkerVector markerVector = it.next();
 				final int count = markerVector.size();
 				final JTextField tArea = txtFieldVector.get(index);
 				tArea.setText("" + count);
@@ -540,7 +539,7 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 		dynRadioVector.add(jrButton);
 		radioGrp.add(jrButton);
 		final String markerName = ("Type " + id);
-		markerVector = new CellCntrMarkerVector(id,markerName);
+		markerVector = new FissionTrackCntrMarkerVector(id,markerName);
 		typeVector.add(markerVector);
 		dynTxtPanel.add(makeDynamicTextArea());
 		return jrButton;
@@ -581,14 +580,13 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 			if (v139t) {
 				displayList = new Overlay();
 				Roi roi = img.getRoi();
-
 				displayList.add(roi);
 				displayList.setStrokeColor(Color.white);
 			}
 			else{
 				displayList = null;
 			}
-			ic = new CellCntrImageCanvas(counterImg, typeVector, this, displayList);
+			ic = new FissionTrackCntrImageCanvas(counterImg, typeVector, this, displayList);
 			new ImageWindow(counterImg, ic);
 		}
 		else if (img.getStackSize() > 1) {
@@ -623,7 +621,7 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 			else{
 				displayList = null;
 			}
-			ic = new CellCntrImageCanvas(counterImg, typeVector, this, displayList);
+			ic = new FissionTrackCntrImageCanvas(counterImg, typeVector, this, displayList);
 			new StackWindow(counterImg, ic);
 		}
 		
@@ -815,9 +813,9 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 		if (typeVector.size() < 1) {
 			return;
 		}
-		final ListIterator<CellCntrMarkerVector> mit = typeVector.listIterator();
+		final ListIterator<FissionTrackCntrMarkerVector> mit = typeVector.listIterator();
 		while (mit.hasNext()) {
-			final CellCntrMarkerVector mv = mit.next();
+			final FissionTrackCntrMarkerVector mv = mit.next();
 			mv.clear();
 		}
 		if (ic != null) ic.repaint();
@@ -826,7 +824,7 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 	public void options() {
 		final Context c = (Context) IJ.runPlugIn("org.scijava.Context", "");
 		final CommandService commandService = c.service(CommandService.class);
-		commandService.run(CellCounterOptions.class, true);
+		commandService.run(FissionTrackCounterOptions.class, true);
 	}
 
 	public void report() {
@@ -852,16 +850,16 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 				final int frame 	= realPosArray[2];
 				
 				results = "";
-				final ListIterator<CellCntrMarkerVector> mit =
+				final ListIterator<FissionTrackCntrMarkerVector> mit =
 					typeVector.listIterator();
 				final int types = typeVector.size();
 				final int[] typeTotals = new int[types];
 				while (mit.hasNext()) {
 					final int type = mit.nextIndex();
-					final CellCntrMarkerVector mv = mit.next();
-					final ListIterator<CellCntrMarker> tit = mv.listIterator();
+					final FissionTrackCntrMarkerVector mv = mit.next();
+					final ListIterator<FissionTrackCntrMarker> tit = mv.listIterator();
 					while (tit.hasNext()) {
-						final CellCntrMarker m = tit.next();
+						final FissionTrackCntrMarker m = tit.next();
 						if (m.getZ() == slice) {
 							typeTotals[type]++;
 						}
@@ -878,9 +876,9 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 			IJ.write("");
 		}
 		results = "Total\t";
-		final ListIterator<CellCntrMarkerVector> mit = typeVector.listIterator();
+		final ListIterator<FissionTrackCntrMarkerVector> mit = typeVector.listIterator();
 		while (mit.hasNext()) {
-			final CellCntrMarkerVector mv = mit.next();
+			final FissionTrackCntrMarkerVector mv = mit.next();
 			final int count = mv.size();
 			results = results.concat(count + "\t");
 		}
@@ -894,7 +892,7 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 		final String storedfilename =
 			rxml.readImgProperties(ReadXML.IMAGE_FILE_PATH);
 		if (storedfilename.equals(img.getTitle())) {
-			final Vector<CellCntrMarkerVector> loadedvector = rxml.readMarkerData();
+			final Vector<FissionTrackCntrMarkerVector> loadedvector = rxml.readMarkerData();
 			typeVector = loadedvector;
 			ic.setTypeVector(typeVector);
 			final int index =
@@ -933,10 +931,10 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 			}
 			
 			// Sets radio button names to loaded names
-			final ListIterator<CellCntrMarkerVector> it = typeVector.listIterator();
+			final ListIterator<FissionTrackCntrMarkerVector> it = typeVector.listIterator();
 			while (it.hasNext()) {
 				final int i = it.nextIndex();
-				final CellCntrMarkerVector markerVector = it.next();
+				final FissionTrackCntrMarkerVector markerVector = it.next();
 				final String name = markerVector.getName();
 				final JRadioButton button = dynRadioVector.get(i);
 				radioGrp.remove(button);
@@ -1000,12 +998,12 @@ public class CellCounter extends JFrame implements ActionListener, ItemListener
 		this.dynRadioVector = buttonVector;
 	}
 
-	public CellCntrMarkerVector getCurrentMarkerVector() {
+	public FissionTrackCntrMarkerVector getCurrentMarkerVector() {
 		return currentMarkerVector;
 	}
 
 	public void setCurrentMarkerVector(
-		final CellCntrMarkerVector currentMarkerVector)
+		final FissionTrackCntrMarkerVector currentMarkerVector)
 	{
 		this.currentMarkerVector = currentMarkerVector;
 	}

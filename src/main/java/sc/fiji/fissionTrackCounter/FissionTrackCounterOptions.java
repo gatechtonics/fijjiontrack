@@ -20,7 +20,7 @@
  * #L%
  */
 
-package sc.fiji.cellCounter;
+package sc.fiji.fissionTrackCounter;
 
 import java.awt.Color;
 
@@ -39,7 +39,7 @@ import org.scijava.util.Colors;
  */
 @Plugin(type = OptionsPlugin.class, label = "Cell Counter Options",
 	attrs = { @Attr(name = "legacy-only") })
-public class CellCounterOptions extends OptionsPlugin {
+public class FissionTrackCounterOptions extends OptionsPlugin {
 
 	// -- Fields --
 
