@@ -22,7 +22,7 @@
 
 // Created on 23 November 2004, 22:56
 
-package sc.fiji.cellCounter;
+package sc.fiji.fissionTrackCounter;
 
 import java.io.BufferedOutputStream;
 import java.io.FileNotFoundException;
@@ -67,7 +67,7 @@ public class WriteXML {
 	}
 
 	public boolean writeXML(final String imgFilename,
-		final Vector<CellCntrMarkerVector> typeVector,
+		final Vector<FissionTrackCntrMarkerVector> typeVector,
 		final int currentType,
 		final Map<String,String> metaData)
 	{
@@ -93,17 +93,17 @@ public class WriteXML {
 			// write the marker data
 			out.write(" <Marker_Data>\r\n");
 			out.write("     <Current_Type>" + currentType + "</Current_Type>\r\n");
-			final ListIterator<CellCntrMarkerVector> it = typeVector.listIterator();
+			final ListIterator<FissionTrackCntrMarkerVector> it = typeVector.listIterator();
 			while (it.hasNext()) {
-				final CellCntrMarkerVector markerVector = it.next();
+				final FissionTrackCntrMarkerVector markerVector = it.next();
 				final int type = markerVector.getType();
 				final String name = markerVector.getName();
 				out.write("     <Marker_Type>\r\n");
 				out.write("         <Type>" + type + "</Type>\r\n");
 				out.write("         <Name>" + name + "</Name>\r\n");
-				final ListIterator<CellCntrMarker> lit = markerVector.listIterator();
+				final ListIterator<FissionTrackCntrMarker> lit = markerVector.listIterator();
 				while (lit.hasNext()) {
-					final CellCntrMarker marker = lit.next();
+					final FissionTrackCntrMarker marker = lit.next();
 					final int x = marker.getX();
 					final int y = marker.getY();
 					final int z = marker.getZ();

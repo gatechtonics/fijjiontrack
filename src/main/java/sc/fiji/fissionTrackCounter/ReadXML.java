@@ -22,7 +22,7 @@
 
 // Created on 27 November 2004, 10:47
 
-package sc.fiji.cellCounter;
+package sc.fiji.fissionTrackCounter;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,7 +51,6 @@ public class ReadXML {
 	private String str;
 	public static final int IMAGE_FILE_PATH = 0;
 	public static final int CURRENT_TYPE = 1;
-
 	/**
 	 * Creates a new instance of ODReadXMLODD
 	 */
@@ -90,9 +89,9 @@ public class ReadXML {
 		return null;
 	}
 
-	public Vector<CellCntrMarkerVector> readMarkerData() {
-		final Vector<CellCntrMarkerVector> typeVector =
-			new Vector<CellCntrMarkerVector>();
+	public Vector<FissionTrackCntrMarkerVector> readMarkerData() {
+		final Vector<FissionTrackCntrMarkerVector> typeVector =
+			new Vector<FissionTrackCntrMarkerVector>();
 		String markerName = "";
 
 		final NodeList markerTypeNodeList = getNodeListFromTag(doc, "Marker_Type");
@@ -107,8 +106,8 @@ public class ReadXML {
 			if(nameNodeList.getLength() > 0) {
 				markerName = readValue(nameNodeList, 0);
 			}
-			final CellCntrMarkerVector markerVector =
-					new CellCntrMarkerVector(Integer.parseInt(readValue(typeNodeList, 0)), markerName);				
+			final FissionTrackCntrMarkerVector markerVector =
+					new FissionTrackCntrMarkerVector(Integer.parseInt(readValue(typeNodeList, 0)), markerName);
 			final NodeList markerNodeList =
 				markerTypeElement.getElementsByTagName("Marker");
 			for (int j = 0; j < markerNodeList.getLength(); j++) {
@@ -119,7 +118,7 @@ public class ReadXML {
 					markerElement.getElementsByTagName("MarkerY");
 				final NodeList markerZNodeList =
 					markerElement.getElementsByTagName("MarkerZ");
-				final CellCntrMarker marker = new CellCntrMarker();
+				final FissionTrackCntrMarker marker = new FissionTrackCntrMarker();
 				marker.setX(Integer.parseInt(readValue(markerXNodeList, 0)));
 				marker.setY(Integer.parseInt(readValue(markerYNodeList, 0)));
 				marker.setZ(Integer.parseInt(readValue(markerZNodeList, 0)));

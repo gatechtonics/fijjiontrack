@@ -22,7 +22,7 @@
 
 // Created on December 13, 2005, 8:40 AM
 
-package sc.fiji.cellCounter;
+package sc.fiji.fissionTrackCounter;
 
 import ij.IJ;
 
@@ -39,32 +39,32 @@ import org.scijava.options.OptionsService;
  *
  * @author Kurt De Vos
  */
-public class CellCntrMarkerVector extends Vector<CellCntrMarker> {
+public class FissionTrackCntrMarkerVector extends Vector<FissionTrackCntrMarker> {
 
 	private int type;
 	private String name;
 
 	/** Creates a new instance of MarkerVector */
-	public CellCntrMarkerVector(final int type) {
+	public FissionTrackCntrMarkerVector(final int type) {
 		this(type, "<Unnamed>");
 	}
 
 	/** Creates a new instance of MarkerVector */
-	public CellCntrMarkerVector(final int type, final String name) {
+	public FissionTrackCntrMarkerVector(final int type, final String name) {
 		super();
 		this.type = type;
 		this.name = name;
 	}
 
-	public void addMarker(final CellCntrMarker marker) {
+	public void addMarker(final FissionTrackCntrMarker marker) {
 		add(marker);
 	}
 
-	public CellCntrMarker getMarker(final int n) {
+	public FissionTrackCntrMarker getMarker(final int n) {
 		return get(n);
 	}
 
-	public int getVectorIndex(final CellCntrMarker marker) {
+	public int getVectorIndex(final FissionTrackCntrMarker marker) {
 		return indexOf(marker);
 	}
 
@@ -76,13 +76,13 @@ public class CellCntrMarkerVector extends Vector<CellCntrMarker> {
 		super.removeElementAt(size() - 1);
 	}
 
-	public CellCntrMarker getMarkerFromPosition(final Point p,
-		final int sliceIndex)
+	public FissionTrackCntrMarker getMarkerFromPosition(final Point p,
+														final int sliceIndex)
 	{
-		final Vector<CellCntrMarker> v = new Vector<CellCntrMarker>();
-		final ListIterator<CellCntrMarker> it = this.listIterator();
+		final Vector<FissionTrackCntrMarker> v = new Vector<FissionTrackCntrMarker>();
+		final ListIterator<FissionTrackCntrMarker> it = this.listIterator();
 		while (it.hasNext()) {
-			final CellCntrMarker m = it.next();
+			final FissionTrackCntrMarker m = it.next();
 			if (m.getZ() == sliceIndex) {
 				v.add(m);
 			}
@@ -90,9 +90,9 @@ public class CellCntrMarkerVector extends Vector<CellCntrMarker> {
 		if(v.size() == 0) {
 			return null;
 		}
-		CellCntrMarker currentsmallest = v.get(0);
+		FissionTrackCntrMarker currentsmallest = v.get(0);
 		for (int i = 1; i < v.size(); i++) {
-			final CellCntrMarker m2 = v.get(i);
+			final FissionTrackCntrMarker m2 = v.get(i);
 			final Point p1 =
 				new Point(currentsmallest.getX(), currentsmallest.getY());
 			final Point p2 = new Point(m2.getX(), m2.getY());
@@ -125,8 +125,8 @@ public class CellCntrMarkerVector extends Vector<CellCntrMarker> {
 	public Color getColor() {
 		final Context c = (Context) IJ.runPlugIn("org.scijava.Context", "");
 		final OptionsService optionsService = c.service(OptionsService.class);
-		final CellCounterOptions options =
-			optionsService.getOptions(CellCounterOptions.class);
+		final FissionTrackCounterOptions options =
+			optionsService.getOptions(FissionTrackCounterOptions.class);
 		return options.getColor(type);
 	}
 
