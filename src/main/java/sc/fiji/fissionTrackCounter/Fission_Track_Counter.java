@@ -22,19 +22,19 @@
 
 // Created on December 27, 2005, 4:56 PM
 
-package sc.fiji.cellCounter;
+package sc.fiji.fissionTrackCounter;
 
 import ij.plugin.frame.PlugInFrame;
 
 /**
  * @author Kurt De Vos
  */
-public class Cell_Counter extends PlugInFrame {
+public class Fission_Track_Counter extends PlugInFrame {
 
-	/** Creates a new instance of Cell_Counter */
-	public Cell_Counter() {
-		super("Cell Counter");
-		new CellCounter();
+	/** Creates a new instance of Fission_Track_Counter */
+	public Fission_Track_Counter() {
+		super("Fission Track Counter");
+		new FissionTrackCounter();
 	}
 
 	@Override

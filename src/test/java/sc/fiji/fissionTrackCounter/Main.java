@@ -20,52 +20,22 @@
  * #L%
  */
 
-// Created on December 13, 2005, 8:41 AM
+package sc.fiji.fissionTrackCounter;
 
-package sc.fiji.cellCounter;
+import fiji.Debug;
+import ij.IJ;
 
 /**
- * TODO
- *
- * @author Kurt De Vos
+ * Tests the {@link Fission_Track_Counter} plugin.
+ * 
+ * @author Curtis Rueden
  */
-public class CellCntrMarker {
+public class Main {
 
-	private int x;
-	private int y;
-	private int z;
+	public static void main(final String... args) {
 
-	/** Creates a new instance of Marker */
-	public CellCntrMarker() {}
-
-	public CellCntrMarker(final int x, final int y, final int z) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
-	}
-
-	public int getX() {
-		return x;
-	}
-
-	public void setX(final int x) {
-		this.x = x;
-	}
-
-	public int getY() {
-		return y;
-	}
-
-	public void setY(final int y) {
-		this.y = y;
-	}
-
-	public int getZ() {
-		return z;
-	}
-
-	public void setZ(final int z) {
-		this.z = z;
+		//IJ.runPlugIn(Fission_Track_Counter.class.getName(), "");
+		Debug.run("Fission Track Counter", "");
 	}
 
 }

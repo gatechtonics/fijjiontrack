@@ -20,19 +20,52 @@
  * #L%
  */
 
-package sc.fiji.cellCounter;
+// Created on December 13, 2005, 8:41 AM
 
-import fiji.Debug;
+package sc.fiji.fissionTrackCounter;
 
 /**
- * Tests the {@link Cell_Counter} plugin.
- * 
- * @author Curtis Rueden
+ * TODO
+ *
+ * @author Kurt De Vos
  */
-public class Main {
+public class FissionTrackCntrMarker {
 
-	public static void main(final String... args) {
-		Debug.run("Cell Counter", "");
+	private int x;
+	private int y;
+	private int z;
+
+	/** Creates a new instance of Marker */
+	public FissionTrackCntrMarker() {}
+
+	public FissionTrackCntrMarker(final int x, final int y, final int z) {
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	}
+
+	public int getX() {
+		return x;
+	}
+
+	public void setX(final int x) {
+		this.x = x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
+	public void setY(final int y) {
+		this.y = y;
+	}
+
+	public int getZ() {
+		return z;
+	}
+
+	public void setZ(final int z) {
+		this.z = z;
 	}
 
 }
