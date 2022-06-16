@@ -176,7 +176,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 
 		autoButtonGrp = new ButtonGroup();
 
-		dynGrid = new GridLayout(4, 1);
+		dynGrid = new GridLayout(5, 1);
 		//dynGrid.setVgap(2);
 
 		//This panel is for automatic counting buttons
@@ -241,15 +241,23 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		JRadioButton btn1 = makeDynRadioButton(1);
 		btn1.setText("Mount Count");
 		dynButtonPanel.add(btn1);
+
 		JRadioButton btn2 = makeDynRadioButton(2);
 		btn2.setText("Mica count");
 		dynButtonPanel.add(btn2);
+
 		JRadioButton btn3 = makeDynRadioButton(3);
 		btn3.setText("2d distance");
 		dynButtonPanel.add(btn3);
+
 		JRadioButton btn4 = makeDynRadioButton(4);
 		btn4.setText("3d distance");
 		dynButtonPanel.add(btn4);
+
+		JRadioButton btn5 = makeDynRadioButton(5);
+		btn5.setText("C-axis");
+		dynButtonPanel.add(btn5);
+
 //		JRadioButton btn5 = makeDynRadioButton(5);
 //		btn5.setText("ROI Modification");
 //		dynButtonPanel.add(btn5);
@@ -715,6 +723,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		else if (command.startsWith(TYPE_COMMAND_PREFIX)) { // COUNT
 			currentMarkerIndex =
 				Integer.parseInt(command.substring(TYPE_COMMAND_PREFIX.length())) - 1;
+			//System.out.println(currentMarkerIndex);
 			if (ic == null) {
 				IJ.error("You need to initialize first");
 				return;
@@ -810,6 +819,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	}
 
  	public void reset() {
+
 		if (typeVector.size() < 1) {
 			return;
 		}
@@ -817,6 +827,11 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		while (mit.hasNext()) {
 			final FissionTrackCntrMarkerVector mv = mit.next();
 			mv.clear();
+			mv.resetNum();
+			if (mv.getType() == 5){
+				mv.resetCAxis();
+			}
+
 		}
 		if (ic != null) ic.repaint();
 	}

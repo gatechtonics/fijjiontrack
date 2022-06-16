@@ -44,6 +44,11 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.util.ListIterator;
 import java.util.Vector;
+import static java.lang.Math.PI;
+import static java.lang.Math.atan;
+import static java.lang.Math.sqrt;
+import static java.lang.Math.acos;
+
 
 /**
  * TODO
@@ -54,6 +59,8 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 
 	private Vector<FissionTrackCntrMarkerVector> typeVector;
 	private FissionTrackCntrMarkerVector currentMarkerVector;
+	private int mountNum = 0;
+	private int micaNum = 0;
 	private final FissionTrackCounter cc;
 	private final ImagePlus img;
 	private boolean delmode = false;
@@ -61,6 +68,7 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 	private boolean showNumbers = true;
 	private boolean showAll = false;
 	private final Font font = new Font("SansSerif", Font.PLAIN, 10);
+	private double cAngle = -1;
 
 	/** Creates a new instance of FissionTrackCntrImageCanvas */
 	public FissionTrackCntrImageCanvas(final ImagePlus img, final Vector<FissionTrackCntrMarkerVector> typeVector,
@@ -96,12 +104,18 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 				if (roi!=null && !roi.containsPoint(x, y)) {
 					IJ.error("The point is outside of ROI");
 				} else {
-					final FissionTrackCntrMarker m = new FissionTrackCntrMarker(x, y, img.getCurrentSlice());
-					currentMarkerVector.addMarker(m);
+					//Add one marker on screen
+					if(currentMarkerVector.getType() != 5 || !currentMarkerVector.getcAxis()) {
+						final FissionTrackCntrMarker m = new FissionTrackCntrMarker(x, y, img.getCurrentSlice());
+						currentMarkerVector.addMarker(m);
+					}
+
 				}
 			} else {
+
 				Point p = new Point(x, y);
 				FissionTrackCntrMarker currentsmallest = currentMarkerVector.getMarkerFromPosition(new Point(x, y), 1);
+
 				for (int i = 1; i <= img.getStackSize(); i++) {
 					FissionTrackCntrMarker m =
 							currentMarkerVector.getMarkerFromPosition(new Point(x, y), i);
@@ -120,7 +134,13 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 						currentsmallest = m;
 					}
 				}
+
 				currentMarkerVector.remove(currentsmallest);
+				currentMarkerVector.redNum();
+
+
+
+				//Reduce variable mCount in FissonTrackCntrMarker
 			}
 			repaint();
 			cc.populateTxtFields();
@@ -187,16 +207,21 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 			g2.setColor(mv.getColor());
 			final ListIterator<FissionTrackCntrMarker> mit = mv.listIterator();
 			boolean flag = false;
+			//flag for c-axis
+			boolean cflag = false;
 			double x = 0;
 			double y = 0;
+			int count = 0;
 			while (mit.hasNext()) {
+				count ++;
 				final FissionTrackCntrMarker m = mit.next();
 				if (true || showAll) {
 					xM = ((m.getX() - srcRect.x) * magnification);
 					yM = ((m.getY() - srcRect.y) * magnification);
 
 				}
-				if (typeID >= 3) {
+				//2D and 3D distances
+				if (typeID == 3 || typeID == 4 ) {
 					if (flag) {
 						g2.drawLine((int) x, (int) y, (int) xM, (int) yM);
 						flag = false;
@@ -208,11 +233,34 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 					g2.fillOval((int) xM , (int) yM, 1, 1);
 					g2.drawOval((int) xM , (int) yM, 1, 1);
 				}
-				else{
+				//Mount/Micro Count
+				else if (typeID == 1 || typeID == 2 ){
 					g2.fillOval((int) xM - 2, (int) yM - 2, 4, 4);
 					g2.drawOval((int) xM - 2, (int) yM - 2, 4, 4);
-					if (showNumbers) g2.drawString(Integer.toString(typeID),
+
+
+					System.out.println(typeID + ",");
+					//Show the count number of the
+					if (showNumbers) g2.drawString(Integer.toString(count),
 							(int) xM + 3, (int) yM - 3);
+				}
+				//C-Axis
+				else if (typeID == 5) {
+					if (cflag) {
+						g2.drawLine((int) x, (int) y, (int) xM, (int) yM);
+						cAngle = 90 - atan(Math.abs(yM - y)/ Math.abs(xM - x))* 180 / PI;
+						cflag = false;
+						mv.setcAxis(true);
+					} else {
+						x = xM;
+						y = yM;
+						cflag = true;
+					}
+
+					g2.fillOval((int) xM , (int) yM, 1, 1);
+					g2.drawOval((int) xM , (int) yM, 1, 1);
+
+
 				}
 			}
 		}
@@ -258,8 +306,9 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 					xM = m.getX();
 					yM = m.getY();
 					g2r.fillOval((int) xM - 2, (int) yM - 2, 4, 4);
-					if (showNumbers) g2r.drawString(Integer.toString(typeID),
-						(int) xM + 3, (int) yM - 3);
+					//Show the number of mount
+					if (showNumbers) g2r.drawString(Integer.toString(typeID == 1? mountNum : micaNum),(int) xM + 3, (int) yM - 3 );
+
 				}
 			}
 		}
@@ -306,7 +355,7 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 						final double yMcal 	= yM * cal.pixelHeight;
 						final double zMcal 	= (zPos-1) * cal.pixelDepth; 		// zPos instead of zM , start at 1 while should start at 0.
 
-						String resultsRow = String.format("%s\t%d\t%d\t%d\t%f\t%d\t%d\t%d\t%.3f\t%.3f\t%.3f",typeID == 2?"Mica":"Mount",zM,xM,yM,value,channel,zPos,frame,xMcal,yMcal,zMcal);
+						String resultsRow = String.format("%s\t%d\t%d\t%d\t%f\t%d\t%d\t%d\t%.3f\t%.3f\t%.3f",typeID == 2?"Mica":"Mount",zM,yM,xM,value,channel,zPos,frame,xMcal,yMcal,zMcal);
 						IJ.write(resultsRow);
 						//IJ.write(typeID + "\t" + zM + "\t" + xM + "\t" + yM + "\t" + value + "\t" + channel + "\t" + zPos + "\t" + frame + "\t" + xMcal + "\t" + yMcal + "\t" +zMcal);
 
@@ -319,7 +368,7 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 	public void measure2() {
 		Calibration cal = img.getCalibration();	
 		String unit = cal.getUnit();
-		String columnHeadings = String.format("Type\tDistance\tX(%s)\tY(%s)\tZ(%s)",unit,unit,unit);
+		String columnHeadings = String.format("Type\tDistance\tX(%s)\tY(%s)\tZ(%s)\t2D-Angle\tC-axis Angle",unit,unit,unit,unit);
 		IJ.setColumnHeadings(columnHeadings);
 		
 		
@@ -334,46 +383,62 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 				final FissionTrackCntrMarkerVector mv = it.next();
 				final int typeID = mv.getType();
 				System.out.println(typeID);
-				final ListIterator<FissionTrackCntrMarker> mit = mv.listIterator();
-				boolean flag = false;
-				double x = 0;
-				double y = 0;
-				double z = 0;
-				while (mit.hasNext()) {
-					String type = typeID == 3 ? "2D": "3D";
-					final FissionTrackCntrMarker m = mit.next();
-					if (m.getZ() == i) {
-						final int xM = m.getX();
-						final int yM = m.getY();
-						final int zM = m.getZ();
-						final double value = ip.getPixelValue(xM, yM);
-						
-						int[] realPosArray = img.convertIndexToPosition(zM); // from the slice we get the array  [channel, slice, frame]
-						final int channel 	= realPosArray[0];
-						final int zPos		= realPosArray[1];
-						final int frame 	= realPosArray[2];
-						final double xMcal 	= xM * cal.pixelWidth ;
-						final double yMcal 	= yM * cal.pixelHeight;
-						final double zMcal 	= (zPos-1) * cal.pixelDepth; 		// zPos instead of zM , start at 1 while should start at 0.
-						if (flag) {
-							flag = false;
-							double temp = Math.pow(xMcal - x, 2) + Math.pow(yMcal - y,2);
-							double distance = Math.sqrt(type == "2D" ? temp: temp + Math.pow(zMcal - z, 2));
-							String resultsRow = String.format("%s\t%.3f\t%.3f\t%.3f\t%.3f",type,distance,xMcal,yMcal,zMcal);
-							IJ.write(resultsRow);
-						} else {
-							flag = true;
-							x = xMcal;
-							y = yMcal;
-							z = zMcal;
-						}
+				if(typeID <= 4){
+					final ListIterator<FissionTrackCntrMarker> mit = mv.listIterator();
+					boolean flag = false;
+					double x = 0;
+					double y = 0;
+					double z = 0;
+					while (mit.hasNext()) {
+						String type = typeID == 3 ? "2D": "3D";
+						final FissionTrackCntrMarker m = mit.next();
+						if (m.getZ() == i) {
+							final int xM = m.getX();
+							final int yM = m.getY();
+							final int zM = m.getZ();
+							final double value = ip.getPixelValue(xM, yM);
+
+							//angle between vertical line (90degree) and the drawn line
+							double vAngle = -1;
+							//angle between drawn c-axis and drawn line
+
+
+							int[] realPosArray = img.convertIndexToPosition(zM); // from the slice we get the array  [channel, slice, frame]
+							final int channel 	= realPosArray[0];
+							final int zPos		= realPosArray[1];
+							final int frame 	= realPosArray[2];
+							final double xMcal 	= xM * cal.pixelWidth ;
+							final double yMcal 	= yM * cal.pixelHeight;
+							final double zMcal 	= (zPos-1) * cal.pixelDepth; 		// zPos instead of zM , start at 1 while should start at 0.
+							if (flag) {
+								flag = false;
+								double temp = Math.pow(xMcal - x, 2) + Math.pow(yMcal - y,2);
+								double distance = Math.sqrt(type == "2D" ? temp: temp + Math.pow(zMcal - z, 2));
+								//Math equation to get value of funciton
+								//*Need to assign final after check
+								vAngle = 90 - atan(Math.abs(yMcal - y)/ Math.abs(xMcal - x))* 180 / PI;
+								System.out.println(vAngle);
+								String angle = type == "2D" ? String.format("%.2f",vAngle) : "NA";
+								String C_axisAngle = type == "2D" ? String.format("%.2f",cAngle) : "NA";
+								String resultsRow = String.format("%s\t%.3f\t%.3f\t%.3f\t%.3f\t%s\t%s",type,distance,xMcal,yMcal,zMcal,angle,C_axisAngle);
+								IJ.write(resultsRow);
+							} else {
+								flag = true;
+								x = xMcal;
+								y = yMcal;
+								z = zMcal;
+							}
 
 //						String resultsRow = String.format("%s\t%.3f\t%.3f\t%.3f\t%.3f",type,distance,xMcal,yMcal,zMcal);
 //						IJ.write(resultsRow);
-						//IJ.write(typeID + "\t" + zM + "\t" + xM + "\t" + yM + "\t" + value + "\t" + channel + "\t" + zPos + "\t" + frame + "\t" + xMcal + "\t" + yMcal + "\t" +zMcal);
-						
+							//IJ.write(typeID + "\t" + zM + "\t" + xM + "\t" + yM + "\t" + value + "\t" + channel + "\t" + zPos + "\t" + frame + "\t" + xMcal + "\t" + yMcal + "\t" +zMcal);
+
+						}
 					}
+
 				}
+
+
 			}
 		}
 	}
