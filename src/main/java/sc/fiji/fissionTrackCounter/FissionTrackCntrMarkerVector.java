@@ -43,6 +43,8 @@ public class FissionTrackCntrMarkerVector extends Vector<FissionTrackCntrMarker>
 
 	private int type;
 	private String name;
+	private int num;//number of marker marker in the vector
+	private boolean cAxis;
 
 	/** Creates a new instance of MarkerVector */
 	public FissionTrackCntrMarkerVector(final int type) {
@@ -54,10 +56,13 @@ public class FissionTrackCntrMarkerVector extends Vector<FissionTrackCntrMarker>
 		super();
 		this.type = type;
 		this.name = name;
+		this.num = 0;
+		this.cAxis = true;
 	}
 
 	public void addMarker(final FissionTrackCntrMarker marker) {
 		add(marker);
+		num++;
 	}
 
 	public FissionTrackCntrMarker getMarker(final int n) {
@@ -70,6 +75,30 @@ public class FissionTrackCntrMarkerVector extends Vector<FissionTrackCntrMarker>
 
 	public void removeMarker(final int n) {
 		remove(n);
+		num--;
+	}
+
+	//Method to reduce value of num
+	public void redNum(){
+		num--;
+	}
+	//Method to retrieve value of num
+	public int getNum(){
+		return num;
+	}
+	//Method to reset value of num
+	public void resetNum(){
+		num = 0;
+	}
+	//Method to reset value of cAxis
+	public void resetCAxis() {cAxis = false;}
+	//
+	public boolean getcAxis() {
+		return cAxis;
+	}
+	//
+	public void setcAxis(boolean cAxis) {
+		this.cAxis = cAxis;
 	}
 
 	public void removeLastMarker() {
