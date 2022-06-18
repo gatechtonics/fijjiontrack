@@ -80,6 +80,8 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	private static final String SHOWNUMBERS = "Show Numbers";
 	private static final String SHOWALL = "Show All";
 	private static final String RESET = "Reset";
+	private static final String RESETCAIXS = "ResetCAxis";
+
 	private static final String EXPORTMARKERS = "Save Markers";
 	private static final String LOADMARKERS = "Load Markers";
 	private static final String EXPORTIMG = "Export Image";
@@ -119,10 +121,11 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	private JButton removeButton;
 	private JButton renameButton;
 	private JButton initializeButton;
-	private JButton optionsButton;
+//	private JButton optionsButton;
 	private JButton resultsButton;
 	private JButton deleteButton;
 	private JButton resetButton;
+	private JButton resetCButton;
 	private JButton exportButton;
 	private JButton loadButton;
 	private JButton exportimgButton;
@@ -258,10 +261,6 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		btn5.setText("C-axis");
 		dynButtonPanel.add(btn5);
 
-//		JRadioButton btn5 = makeDynRadioButton(5);
-//		btn5.setText("ROI Modification");
-//		dynButtonPanel.add(btn5);
-
 		// create a "static" panel to hold control buttons
 		statButtonPanel = new JPanel();
 		statButtonPanel.setBorder(BorderFactory.createTitledBorder("Actions"));
@@ -387,9 +386,10 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		gbc.gridx = 0;
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
-		optionsButton = makeButton(OPTIONS, "show options dialog");
-		gb.setConstraints(optionsButton, gbc);
-		statButtonPanel.add(optionsButton);
+
+//		optionsButton = makeButton(OPTIONS, "show options dialog");
+//		gb.setConstraints(optionsButton, gbc);
+//		statButtonPanel.add(optionsButton);
 
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -411,6 +411,16 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		resetButton.setEnabled(false);
 		gb.setConstraints(resetButton, gbc);
 		statButtonPanel.add(resetButton);
+
+		gbc = new GridBagConstraints();
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.gridx = 0;
+		gbc.gridwidth = GridBagConstraints.REMAINDER;
+		resetCButton = makeButton(RESETCAIXS, "only reset c-axis");
+		resetCButton.setEnabled(false);
+		gb.setConstraints(resetCButton, gbc);
+		statButtonPanel.add(resetCButton);
 
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -657,6 +667,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		resultsButton.setEnabled(true);
 		deleteButton.setEnabled(true);
 		resetButton.setEnabled(true);
+		resetCButton.setEnabled(true);
 		exportButton.setEnabled(true);
 		exportimgButton.setEnabled(true);
 		measureButton.setEnabled(true);
@@ -738,9 +749,12 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		else if (command.equals(RESET)) {
 			reset();
 		}
-		else if (command.equals(OPTIONS)) {
-			options();
+		else if (command.equals(RESETCAIXS)){
+			resetCAxis();
 		}
+//		else if (command.equals(OPTIONS)) {
+//			options();
+//		}
 		else if (command.equals(RESULTS)) {
 			report();
 		}
@@ -828,19 +842,33 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 			final FissionTrackCntrMarkerVector mv = mit.next();
 			mv.clear();
 			mv.resetNum();
-			if (mv.getType() == 5){
-				mv.resetCAxis();
-			}
-
 		}
 		if (ic != null) ic.repaint();
 	}
 
-	public void options() {
-		final Context c = (Context) IJ.runPlugIn("org.scijava.Context", "");
-		final CommandService commandService = c.service(CommandService.class);
-		commandService.run(FissionTrackCounterOptions.class, true);
+	//Method to reset the C-Axis only
+	public void resetCAxis() {
+		if (typeVector.size() < 1) {
+			return;
+		}
+		final ListIterator<FissionTrackCntrMarkerVector> mit = typeVector.listIterator();
+		while (mit.hasNext()) {
+			final FissionTrackCntrMarkerVector mv = mit.next();
+			if (mv.getType() == 5) {
+				mv.resetCAxis();
+				mv.clear();
+				mv.resetNum();
+			}
+		}
+		if (ic != null) ic.repaint();
+
 	}
+
+//	public void options() {
+//		final Context c = (Context) IJ.runPlugIn("org.scijava.Context", "");
+//		final CommandService commandService = c.service(CommandService.class);
+//		commandService.run(FissionTrackCounterOptions.class, true);
+//	}
 
 	public void report() {
 		String labels = "Slice\t";
