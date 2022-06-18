@@ -105,7 +105,8 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 					IJ.error("The point is outside of ROI");
 				} else {
 					//Add one marker on screen
-					if(currentMarkerVector.getType() != 5 || !currentMarkerVector.getcAxis()) {
+					if( currentMarkerVector.getType() != 5 || currentMarkerVector.getcAxis()) {
+						System.out.println(currentMarkerVector.getcAxis());
 						final FissionTrackCntrMarker m = new FissionTrackCntrMarker(x, y, img.getCurrentSlice());
 						currentMarkerVector.addMarker(m);
 					}
@@ -246,11 +247,12 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 				}
 				//C-Axis
 				else if (typeID == 5) {
+					System.out.println(cflag);
 					if (cflag) {
 						g2.drawLine((int) x, (int) y, (int) xM, (int) yM);
 						cAngle = 90 - atan(Math.abs(yM - y)/ Math.abs(xM - x))* 180 / PI;
 						cflag = false;
-						mv.setcAxis(true);
+						mv.setcAxis(false);
 					} else {
 						x = xM;
 						y = yM;

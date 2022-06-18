@@ -90,8 +90,8 @@ public class FissionTrackCntrMarkerVector extends Vector<FissionTrackCntrMarker>
 	public void resetNum(){
 		num = 0;
 	}
-	//Method to reset value of cAxis
-	public void resetCAxis() {cAxis = false;}
+	//Method to celar all the CAxis on image cAxis
+	public void resetCAxis() {cAxis = true;}
 	//
 	public boolean getcAxis() {
 		return cAxis;
