@@ -68,7 +68,8 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 	private boolean showNumbers = true;
 	private boolean showAll = false;
 	private final Font font = new Font("SansSerif", Font.PLAIN, 10);
-	private double cAngle = -1;
+	private String cAngle = "NA";
+	private double cAxisVal = -361;
 
 	/** Creates a new instance of FissionTrackCntrImageCanvas */
 	public FissionTrackCntrImageCanvas(final ImagePlus img, final Vector<FissionTrackCntrMarkerVector> typeVector,
@@ -250,7 +251,8 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 					System.out.println(cflag);
 					if (cflag) {
 						g2.drawLine((int) x, (int) y, (int) xM, (int) yM);
-						cAngle = 90 - atan(Math.abs(yM - y)/ Math.abs(xM - x))* 180 / PI;
+						cAxisVal = 90 - atan(Math.abs(yM - y)/ Math.abs(xM - x))* 180 / PI;
+//						cAngle =  String.format("%.2f", temp);
 						cflag = false;
 						mv.setcAxis(false);
 					} else {
@@ -370,7 +372,7 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 	public void measure2() {
 		Calibration cal = img.getCalibration();	
 		String unit = cal.getUnit();
-		String columnHeadings = String.format("Type\tDistance\tX(%s)\tY(%s)\tZ(%s)\t2D-Angle\tC-axis Angle",unit,unit,unit,unit);
+		String columnHeadings = String.format("Type\tDistance\tX(%s)\tY(%s)\tZ(%s)\t2D-Angle\tCorrect Distance",unit,unit,unit,unit);
 		IJ.setColumnHeadings(columnHeadings);
 		
 		
@@ -379,6 +381,7 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 			final ImageProcessor ip = img.getProcessor();
 			
 			final ListIterator<FissionTrackCntrMarkerVector> it = typeVector.listIterator();
+			//To skip the first two (Mica/Mount) option
 			it.next();
 			it.next();
 			while (it.hasNext()) {
@@ -420,8 +423,13 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 								//*Need to assign final after check
 								vAngle = 90 - atan(Math.abs(yMcal - y)/ Math.abs(xMcal - x))* 180 / PI;
 								System.out.println(vAngle);
-								String angle = type == "2D" ? String.format("%.2f",vAngle) : "NA";
-								String C_axisAngle = type == "2D" ? String.format("%.2f",cAngle) : "NA";
+								String angle = type.equals("2D") ? String.format("%.2f",vAngle) : "NA";
+								if(cAxisVal != -361){
+									//!!Check, the angle is negative
+									cAngle = String.format("%2f", distance* Math.cos(Math.toRadians( Math.abs(cAxisVal - vAngle))));
+								}
+								System.out.println("cAxis:"+ mv.getcAxis() + "type" + type);
+								String C_axisAngle = type.equals("2D") ? cAngle : "NA";
 								String resultsRow = String.format("%s\t%.3f\t%.3f\t%.3f\t%.3f\t%s\t%s",type,distance,xMcal,yMcal,zMcal,angle,C_axisAngle);
 								IJ.write(resultsRow);
 							} else {

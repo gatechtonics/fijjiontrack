@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CellCounter_Marker_File>
+ <Image_Properties>
+     <Image_Filename>Untitled-1.jpg</Image_Filename>
+     <X_Calibration>1.0</X_Calibration>
+     <Z_Calibration>1.0</Z_Calibration>
+     <Calibration_Unit>pixel</Calibration_Unit>
+     <Y_Calibration>1.0</Y_Calibration>
+ </Image_Properties>
+ <Marker_Data>
+     <Current_Type>3</Current_Type>
+     <Marker_Type>
+         <Type>1</Type>
+         <Name>Type 1</Name>
+     </Marker_Type>
+     <Marker_Type>
+         <Type>2</Type>
+         <Name>Type 2</Name>
+     </Marker_Type>
+     <Marker_Type>
+         <Type>3</Type>
+         <Name>Type 3</Name>
+         <Marker>
+             <MarkerX>946</MarkerX>
+             <MarkerY>1092</MarkerY>
+             <MarkerZ>1</MarkerZ>
+         </Marker>
+         <Marker>
+             <MarkerX>704</MarkerX>
+             <MarkerY>1308</MarkerY>
+             <MarkerZ>1</MarkerZ>
+         </Marker>
+     </Marker_Type>
+     <Marker_Type>
+         <Type>4</Type>
+         <Name>Type 4</Name>
+         <Marker>
+             <MarkerX>578</MarkerX>
+             <MarkerY>1158</MarkerY>
+             <MarkerZ>1</MarkerZ>
+         </Marker>
+         <Marker>
+             <MarkerX>810</MarkerX>
+             <MarkerY>1470</MarkerY>
+             <MarkerZ>1</MarkerZ>
+         </Marker>
+     </Marker_Type>
+     <Marker_Type>
+         <Type>5</Type>
+         <Name>Type 5</Name>
+     </Marker_Type>
+ </Marker_Data>
+</CellCounter_Marker_File>
