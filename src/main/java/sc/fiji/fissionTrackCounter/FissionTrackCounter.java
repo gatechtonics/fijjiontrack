@@ -76,6 +76,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	private static final String RESULTS = "Results";
 	private static final String DELETE = "Undo";
 	private static final String DELMODE = "Delete Mode";
+	private static final String UNIMODE = "Unique ID";
 	private static final String KEEPORIGINAL = "Keep Original";
 	private static final String SHOWNUMBERS = "Show Numbers";
 	private static final String SHOWALL = "Show All";
@@ -85,9 +86,9 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	private static final String EXPORTMARKERS = "Save Markers";
 	private static final String LOADMARKERS = "Load Markers";
 	private static final String EXPORTIMG = "Export Image";
-	private static final String MEASURE = "Measure...";
+	private static final String MEASURE = "Mount/Mica Count";
 
-	private static final String MEASURE2 = "Measure Distances";
+	private static final String MEASURE2 = "2D/3D Distances";
 	private static final String ROIMODIFY = "Drag ROI";
 
 	private static final String TYPE_COMMAND_PREFIX = "type";
@@ -114,6 +115,8 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	private JCheckBox newCheck;
 	private JCheckBox numbersCheck;
 	private JCheckBox showAllCheck;
+	//option for Mica/Mount Counter
+	private JCheckBox uniqueID;
 	private ButtonGroup radioGrp;
 	private ButtonGroup autoButtonGrp;
 	private JSeparator separator;
@@ -277,6 +280,17 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		newCheck.addItemListener(this);
 		gb.setConstraints(newCheck, gbc);
 		statButtonPanel.add(newCheck);
+		//Check for consistent/inconsistent count for marker
+		uniqueID = new JCheckBox(UNIMODE);
+		uniqueID.setToolTipText("Unique Marker ID");
+		uniqueID.setSelected(true);
+		uniqueID.addItemListener(this);
+		gb.setConstraints(uniqueID, gbc);
+		statButtonPanel.add(uniqueID);
+
+
+
+
 
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -391,16 +405,35 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 //		gb.setConstraints(optionsButton, gbc);
 //		statButtonPanel.add(optionsButton);
 
+//		gbc = new GridBagConstraints();
+//		gbc.anchor = GridBagConstraints.NORTHWEST;
+//		gbc.fill = GridBagConstraints.BOTH;
+//		gbc.gridx = 0;
+//		gbc.gridwidth = GridBagConstraints.REMAINDER;
+//		gbc.gridwidth = GridBagConstraints.REMAINDER;
+//		resultsButton = makeButton(RESULTS, "show results in results table");
+//		resultsButton.setEnabled(false);
+//		gb.setConstraints(resultsButton, gbc);
+//		statButtonPanel.add(resultsButton);
+
+
+
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.gridx = 0;
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
-		gbc.gridwidth = GridBagConstraints.REMAINDER;
-		resultsButton = makeButton(RESULTS, "show results in results table");
-		resultsButton.setEnabled(false);
-		gb.setConstraints(resultsButton, gbc);
-		statButtonPanel.add(resultsButton);
+		measureButton =
+				makeButton(MEASURE, "Measure pixel intensity of marker points");
+		measureButton.setEnabled(false);
+		gb.setConstraints(measureButton, gbc);
+		statButtonPanel.add(measureButton);
+
+		measure2Button =
+				makeButton(MEASURE2, "Measure pixel intensity of marker points");
+		measure2Button.setEnabled(false);
+		gb.setConstraints(measure2Button, gbc);
+		statButtonPanel.add(measure2Button);
 
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -494,22 +527,22 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		gb.setConstraints(separator, gbc);
 		statButtonPanel.add(separator);
 
-		gbc = new GridBagConstraints();
-		gbc.anchor = GridBagConstraints.NORTHWEST;
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.gridx = 0;
-		gbc.gridwidth = GridBagConstraints.REMAINDER;
-		measureButton =
-			makeButton(MEASURE, "Measure pixel intensity of marker points");
-		measureButton.setEnabled(false);
-		gb.setConstraints(measureButton, gbc);
-		statButtonPanel.add(measureButton);
-
-		measure2Button =
-				makeButton(MEASURE2, "Measure pixel intensity of marker points");
-		measure2Button.setEnabled(false);
-		gb.setConstraints(measure2Button, gbc);
-		statButtonPanel.add(measure2Button);
+//		gbc = new GridBagConstraints();
+//		gbc.anchor = GridBagConstraints.NORTHWEST;
+//		gbc.fill = GridBagConstraints.BOTH;
+//		gbc.gridx = 0;
+//		gbc.gridwidth = GridBagConstraints.REMAINDER;
+//		measureButton =
+//			makeButton(MEASURE, "Measure pixel intensity of marker points");
+//		measureButton.setEnabled(false);
+//		gb.setConstraints(measureButton, gbc);
+//		statButtonPanel.add(measureButton);
+//
+//		measure2Button =
+//				makeButton(MEASURE2, "Measure pixel intensity of marker points");
+//		measure2Button.setEnabled(false);
+//		gb.setConstraints(measure2Button, gbc);
+//		statButtonPanel.add(measure2Button);
 
 		gbc = new GridBagConstraints();
 		//gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -664,7 +697,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		addButton.setEnabled(true);
 		removeButton.setEnabled(true);
 		renameButton.setEnabled(true);
-		resultsButton.setEnabled(true);
+//		resultsButton.setEnabled(true);
 		deleteButton.setEnabled(true);
 		resetButton.setEnabled(true);
 		resetCButton.setEnabled(true);
