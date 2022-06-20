@@ -44,6 +44,11 @@ public class FissionTrackCntrMarkerVector extends Vector<FissionTrackCntrMarker>
 	private int type;
 	private String name;
 	private int num;//number of marker marker in the vector
+	/**
+	 * If C-AXIS is ready to be drawn
+	 * True: cAxis is ready to be drawn
+	 * False: cAxis isn't ready to be drawn
+	 */
 	private boolean cAxis;
 
 	/** Creates a new instance of MarkerVector */
