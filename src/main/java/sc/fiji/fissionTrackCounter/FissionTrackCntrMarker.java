@@ -34,8 +34,8 @@ public class FissionTrackCntrMarker {
 	private int x;
 	private int y;
 	private int z;
-//	private int count;
-//	public static int mCount = 0;
+	private int count;
+	private int ID;
 
 	/** Creates a new instance of Marker */
 	public FissionTrackCntrMarker() {}
@@ -52,7 +52,19 @@ public class FissionTrackCntrMarker {
 		return x;
 	}
 
-//	public int getCount() {return count;}
+	public int getCount() {return count;}
+
+	public void setCount(int count){
+		this.count = count;
+	}
+
+	public int getID() {
+		return ID;
+	}
+
+	public void setID(int ID) {
+		this.ID = ID;
+	}
 
 	public void setX(final int x) {
 		this.x = x;

@@ -59,13 +59,12 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 
 	private Vector<FissionTrackCntrMarkerVector> typeVector;
 	private FissionTrackCntrMarkerVector currentMarkerVector;
-	private int mountNum = 0;
-	private int micaNum = 0;
 	private final FissionTrackCounter cc;
 	private final ImagePlus img;
 	private boolean delmode = false;
 	private boolean roimode = false;
 	private boolean showNumbers = true;
+	private boolean uniqueMarkerID = true;
 	private boolean showAll = false;
 	private final Font font = new Font("SansSerif", Font.PLAIN, 10);
 	private String cAngle = "NA";
@@ -110,6 +109,7 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 						System.out.println(currentMarkerVector.getcAxis());
 						final FissionTrackCntrMarker m = new FissionTrackCntrMarker(x, y, img.getCurrentSlice());
 						currentMarkerVector.addMarker(m);
+						m.setID(currentMarkerVector.getUniuqeID());
 					}
 
 				}
@@ -138,7 +138,7 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 				}
 
 				currentMarkerVector.remove(currentsmallest);
-				currentMarkerVector.redNum();
+//				currentMarkerVector.redNum();
 
 
 
@@ -213,9 +213,10 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 			boolean cflag = false;
 			double x = 0;
 			double y = 0;
-			int count = 0;
+			int consistentCount = 0;
+			int uniqueCount = 0;
 			while (mit.hasNext()) {
-				count ++;
+				consistentCount ++;
 				final FissionTrackCntrMarker m = mit.next();
 				if (true || showAll) {
 					xM = ((m.getX() - srcRect.x) * magnification);
@@ -242,9 +243,18 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 
 
 					System.out.println(typeID + ",");
-					//Show the count number of the
-					if (showNumbers) g2.drawString(Integer.toString(count),
-							(int) xM + 3, (int) yM - 3);
+					//Show the consistentCount number of the
+					if (showNumbers) {
+						if(!uniqueMarkerID){
+							g2.drawString(Integer.toString(consistentCount),
+									(int) xM + 3, (int) yM - 3);
+						}else{
+							g2.drawString(Integer.toString(m.getID()),
+									(int) xM + 3, (int) yM - 3);
+						}
+
+					}
+
 				}
 				//C-Axis
 				else if (typeID == 5) {
@@ -252,7 +262,6 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 					if (cflag) {
 						g2.drawLine((int) x, (int) y, (int) xM, (int) yM);
 						cAxisVal = 90 - atan(Math.abs(yM - y)/ Math.abs(xM - x))* 180 / PI;
-//						cAngle =  String.format("%.2f", temp);
 						cflag = false;
 						mv.setcAxis(false);
 					} else {
@@ -310,8 +319,6 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 					xM = m.getX();
 					yM = m.getY();
 					g2r.fillOval((int) xM - 2, (int) yM - 2, 4, 4);
-					//Show the number of mount
-					if (showNumbers) g2r.drawString(Integer.toString(typeID == 1? mountNum : micaNum),(int) xM + 3, (int) yM - 3 );
 
 				}
 			}
@@ -423,10 +430,10 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 								//*Need to assign final after check
 								vAngle = 90 - atan(Math.abs(yMcal - y)/ Math.abs(xMcal - x))* 180 / PI;
 								System.out.println(vAngle);
-								String angle = type.equals("2D") ? String.format("%.2f",vAngle) : "NA";
+								String angle = type.equals("2D") ? String.format("%.3f",vAngle) : "NA";
 								if(cAxisVal != -361){
 									//!!Check, the angle is negative
-									cAngle = String.format("%2f", distance* Math.cos(Math.toRadians( Math.abs(cAxisVal - vAngle))));
+									cAngle = String.format("%.3f", distance* Math.cos(Math.toRadians( Math.abs(cAxisVal - vAngle))));
 								}
 								System.out.println("cAxis:"+ mv.getcAxis() + "type" + type);
 								String C_axisAngle = type.equals("2D") ? cAngle : "NA";
@@ -484,6 +491,14 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 	}
 	public void setRoimode(final boolean roimode) {
 		this.roimode = roimode;
+	}
+
+	public void setUniqueID(final boolean uniqueMarkerID){
+		this.uniqueMarkerID = uniqueMarkerID;
+	}
+
+	public boolean isUniuqeMarkerID(){
+		return uniqueMarkerID;
 	}
 
 	public boolean isShowNumbers() {

@@ -693,6 +693,8 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		roiCheck.setEnabled(true);
 		numbersCheck.setEnabled(true);
 		showAllCheck.setSelected(false);
+		uniqueID.setSelected(true);
+		delCheck.setSelected(false);
 		if (counterImg.getStackSize() > 1) showAllCheck.setEnabled(true);
 		addButton.setEnabled(true);
 		removeButton.setEnabled(true);
@@ -705,6 +707,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		exportimgButton.setEnabled(true);
 		measureButton.setEnabled(true);
 		measure2Button.setEnabled(true);
+
 	}
 
 	void validateLayout() {
@@ -821,6 +824,17 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 				ic.setDelmode(false);
 			}
 		}
+		//action for unique marker id
+		else if(e.getItem().equals(uniqueID)){
+			if(e.getStateChange() == ItemEvent.SELECTED){
+				ic.setUniqueID(true);
+			}
+			else {
+				ic.setUniqueID(false);
+			}
+
+
+		}
 		else if(e.getItem().equals(roiCheck)) {
 			if (e.getStateChange() == ItemEvent.SELECTED) {
 				ic.setRoimode(true);
@@ -874,7 +888,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		while (mit.hasNext()) {
 			final FissionTrackCntrMarkerVector mv = mit.next();
 			mv.clear();
-			mv.resetNum();
+			mv.resetID();
 		}
 		if (ic != null) ic.repaint();
 	}
@@ -890,7 +904,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 			if (mv.getType() == 5) {
 				mv.resetCAxis();
 				mv.clear();
-				mv.resetNum();
+//				mv.resetNum();
 			}
 		}
 		if (ic != null) ic.repaint();
