@@ -44,6 +44,7 @@ public class FissionTrackCntrMarkerVector extends Vector<FissionTrackCntrMarker>
 	private int type;
 	private String name;
 	private int num;//number of marker marker in the vector
+	private int uniuqeID;
 	/**
 	 * If C-AXIS is ready to be drawn
 	 * True: cAxis is ready to be drawn
@@ -61,13 +62,13 @@ public class FissionTrackCntrMarkerVector extends Vector<FissionTrackCntrMarker>
 		super();
 		this.type = type;
 		this.name = name;
-		this.num = 0;
+		this.uniuqeID = 0;
 		this.cAxis = true;
 	}
 
 	public void addMarker(final FissionTrackCntrMarker marker) {
 		add(marker);
-		num++;
+		uniuqeID++;
 	}
 
 	public FissionTrackCntrMarker getMarker(final int n) {
@@ -80,27 +81,20 @@ public class FissionTrackCntrMarkerVector extends Vector<FissionTrackCntrMarker>
 
 	public void removeMarker(final int n) {
 		remove(n);
-		num--;
 	}
 
-	//Method to reduce value of num
-	public void redNum(){
-		num--;
+	public void resetID(){
+		this.uniuqeID = 0;
 	}
-	//Method to retrieve value of num
-	public int getNum(){
-		return num;
-	}
-	//Method to reset value of num
-	public void resetNum(){
-		num = 0;
-	}
+
 	//Method to celar all the CAxis on image cAxis
 	public void resetCAxis() {cAxis = true;}
 	//
 	public boolean getcAxis() {
 		return cAxis;
 	}
+
+	public int getUniuqeID() {return uniuqeID;}
 	//
 	public void setcAxis(boolean cAxis) {
 		this.cAxis = cAxis;
