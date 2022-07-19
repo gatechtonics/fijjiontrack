@@ -47,7 +47,7 @@ public class FissionTrackCounterOptions extends OptionsPlugin {
 	private ColorRGB color1 = Colors.CYAN;
 
 	@Parameter
-	private ColorRGB color2 = Colors.RED;
+	private ColorRGB color2 = Colors.BLUE;
 
 	@Parameter
 	private ColorRGB color3 = Colors.ROYALBLUE;
@@ -74,7 +74,7 @@ public class FissionTrackCounterOptions extends OptionsPlugin {
 			case 1:
 				return AWTColors.getColor(Colors.CYAN);
 			case 2:
-				return AWTColors.getColor(Colors.RED);
+				return AWTColors.getColor(Colors.BLUE);
 			case 3:
 				return AWTColors.getColor(Colors.ROYALBLUE);
 			case 4:
