@@ -74,7 +74,8 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	private static final String INITIALIZE = "Initialize";
 	private static final String OPTIONS = "Options";
 	private static final String RESULTS = "Results";
-	private static final String DELETE = "Undo";
+	private static final String UNDO = "Undo";
+	private static final String REDO = "Redo";
 	private static final String DELMODE = "Delete Mode";
 	private static final String UNIMODE = "Unique ID";
 	private static final String KEEPORIGINAL = "Keep Original";
@@ -126,7 +127,8 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	private JButton initializeButton;
 //	private JButton optionsButton;
 	private JButton resultsButton;
-	private JButton deleteButton;
+	private JButton unDoButton;
+	private JButton reDoButton;
 	private JButton resetButton;
 	private JButton resetCButton;
 	private JButton exportButton;
@@ -356,10 +358,20 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.gridx = 0;
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
-		deleteButton = makeButton(DELETE, "delete last marker");
-		deleteButton.setEnabled(false);
-		gb.setConstraints(deleteButton, gbc);
-		statButtonPanel.add(deleteButton);
+		unDoButton = makeButton(UNDO,"delete last marker");
+		unDoButton.setEnabled(false);
+		gb.setConstraints(unDoButton, gbc);
+		statButtonPanel.add(unDoButton);
+
+		gbc = new GridBagConstraints();
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.gridx = 0;
+		gbc.gridwidth = GridBagConstraints.REMAINDER;
+		reDoButton = makeButton(REDO,"delete last marker");
+		reDoButton.setEnabled(false);
+		gb.setConstraints(reDoButton, gbc);
+		statButtonPanel.add(reDoButton);
 
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -617,15 +629,15 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 			IJ.noImage();
 		}
 		else if (img.getStackSize() == 1) {
-			
-			
+
+
 			ImageProcessor ip = img.getProcessor();
 			//ip.resetRoi();
-			
+
 			if (keepOriginal) ip = ip.crop();
 			//if(true) ip = ip.crop();
 			counterImg = new ImagePlus("Counter Window - " + img.getTitle(), ip);
-			
+
 			@SuppressWarnings("unchecked")
 			Overlay displayList;
 			if (v139t) {
@@ -651,7 +663,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 			}
 			counterImg =
 				new ImagePlus("Counter Window - " + img.getTitle(), counterStack);
-			
+
 			counterImg.setDimensions(img.getNChannels(), img.getNSlices(), img
 				.getNFrames());
 			if (img.isComposite()) {
@@ -700,7 +712,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		removeButton.setEnabled(true);
 		renameButton.setEnabled(true);
 //		resultsButton.setEnabled(true);
-		deleteButton.setEnabled(true);
+		unDoButton.setEnabled(true);
 		resetButton.setEnabled(true);
 		resetCButton.setEnabled(true);
 		exportButton.setEnabled(true);
@@ -779,7 +791,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 			currentMarkerVector = typeVector.get(currentMarkerIndex);
 			ic.setCurrentMarkerVector(currentMarkerVector);
 		}
-		else if (command.equals(DELETE)) {
+		else if (command.equals(UNDO)) {
 			ic.removeLastMarker();
 		}
 		else if (command.equals(RESET)) {

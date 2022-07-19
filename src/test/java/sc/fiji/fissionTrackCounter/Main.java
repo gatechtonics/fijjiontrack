@@ -35,7 +35,7 @@ public class Main {
 	public static void main(final String... args) {
 
 		//IJ.runPlugIn(Fission_Track_Counter.class.getName(), "");
-		Debug.run("Fission Track Counter", "");
+		Debug.run("Fijjiontrack", "");
 	}
 
 }

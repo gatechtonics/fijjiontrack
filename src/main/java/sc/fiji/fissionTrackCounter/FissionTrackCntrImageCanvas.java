@@ -20,7 +20,7 @@
  * #L%
  */
 
-// Created on November 22, 2005, 5:58 PM
+// This class contain all the methods and option applied in
 
 package sc.fiji.fissionTrackCounter;
 
@@ -78,8 +78,10 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 		this.img = img;
 		this.typeVector = typeVector;
 		this.cc = cc;
+
 		//if (displayList != null) this.setDisplayList(displayList);
 		if (displayList != null) this.setOverlay(displayList);
+
 	}
 
 	@Override
@@ -188,6 +190,8 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 	public void mouseClicked(final MouseEvent e) {
 		super.mouseClicked(e);
 	}
+
+
 
 	private Rectangle srcRect = new Rectangle(0, 0, 0, 0);
 
