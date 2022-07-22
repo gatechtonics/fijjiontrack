@@ -57,6 +57,10 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.EtchedBorder;
 
+import javafx.geometry.Orientation;
+import javafx.scene.Group;
+import javafx.scene.control.ScrollBar;
+import javafx.scene.layout.VBox;
 import org.scijava.Context;
 import org.scijava.command.CommandService;
 
@@ -627,66 +631,91 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		final boolean v139t = IJ.getVersion().compareTo("1.39t") >= 0;
 		if (img == null) {
 			IJ.noImage();
-		}
-		else if (img.getStackSize() == 1) {
+		}else {
+
+			if (img.getStackSize() == 1) {
 
 
-			ImageProcessor ip = img.getProcessor();
-			//ip.resetRoi();
+				ImageProcessor ip = img.getProcessor();
+				//ip.resetRoi();
 
-			if (keepOriginal) ip = ip.crop();
-			//if(true) ip = ip.crop();
-			counterImg = new ImagePlus("Counter Window - " + img.getTitle(), ip);
-
-			@SuppressWarnings("unchecked")
-			Overlay displayList;
-			if (v139t) {
-				displayList = new Overlay();
-				Roi roi = img.getRoi();
-				displayList.add(roi);
-				displayList.setStrokeColor(Color.white);
-			}
-			else{
-				displayList = null;
-			}
-			ic = new FissionTrackCntrImageCanvas(counterImg, typeVector, this, displayList);
-			new ImageWindow(counterImg, ic);
-		}
-		else if (img.getStackSize() > 1) {
-			final ImageStack stack = img.getStack();
-			final int size = stack.getSize();
-			final ImageStack counterStack = img.createEmptyStack();
-			for (int i = 1; i <= size; i++) {
-				ImageProcessor ip = stack.getProcessor(i);
 				if (keepOriginal) ip = ip.crop();
-				counterStack.addSlice(stack.getSliceLabel(i), ip);
-			}
-			counterImg =
-				new ImagePlus("Counter Window - " + img.getTitle(), counterStack);
+				//if(true) ip = ip.crop();
+				counterImg = new ImagePlus("Counter Window - " + img.getTitle(), ip);
 
-			counterImg.setDimensions(img.getNChannels(), img.getNSlices(), img
-				.getNFrames());
-			if (img.isComposite()) {
+				@SuppressWarnings("unchecked")
+				Overlay displayList;
+				if (v139t) {
+					displayList = new Overlay();
+					Roi roi = img.getRoi();
+					displayList.add(roi);
+					displayList.setStrokeColor(Color.white);
+				}
+				else{
+					displayList = null;
+				}
+				ic = new FissionTrackCntrImageCanvas(counterImg, typeVector, this, displayList);
+				new ImageWindow(counterImg, ic);
+
+
+
+//				ScrollBar scroll = new ScrollBar();
+//				scroll.setMin(0);
+//				scroll.setOrientation(Orientation.VERTICAL);
+//				scroll.setPrefHeight(200);
+//				scroll.setPrefWidth(20);
+				// create a Group
+//				Group group = new Group(ic);
+//
+//				// create a scene
+//				Scene scene = new Scene(group, 400, 400);
+//
+//				// set the scene
+//				stage.setScene(scene);
+//
+//				stage.show();
+
+
+
+			}
+			else if (img.getStackSize() > 1) {
+				final ImageStack stack = img.getStack();
+				final int size = stack.getSize();
+				final ImageStack counterStack = img.createEmptyStack();
+				for (int i = 1; i <= size; i++) {
+					ImageProcessor ip = stack.getProcessor(i);
+					if (keepOriginal) ip = ip.crop();
+					counterStack.addSlice(stack.getSliceLabel(i), ip);
+				}
 				counterImg =
-					new CompositeImage(counterImg, ((CompositeImage) img).getMode());
-				((CompositeImage) counterImg).copyLuts(img);
-			}
-			counterImg.setOpenAsHyperStack(img.isHyperStack());
-			@SuppressWarnings("unchecked")
-			Overlay displayList;
-			if (v139t) {
-				displayList = new Overlay();
-				Roi roi = img.getRoi();
-				displayList.add(roi);
-				displayList.setStrokeColor(Color.white);
+						new ImagePlus("Counter Window - " + img.getTitle(), counterStack);
 
+				counterImg.setDimensions(img.getNChannels(), img.getNSlices(), img
+						.getNFrames());
+				if (img.isComposite()) {
+					counterImg =
+							new CompositeImage(counterImg, ((CompositeImage) img).getMode());
+					((CompositeImage) counterImg).copyLuts(img);
+				}
+				counterImg.setOpenAsHyperStack(img.isHyperStack());
+				@SuppressWarnings("unchecked")
+				Overlay displayList;
+				if (v139t) {
+					displayList = new Overlay();
+					Roi roi = img.getRoi();
+					displayList.add(roi);
+					displayList.setStrokeColor(Color.white);
+
+				}
+				else{
+					displayList = null;
+				}
+				ic = new FissionTrackCntrImageCanvas(counterImg, typeVector, this, displayList);
+				new StackWindow(counterImg, ic);
 			}
-			else{
-				displayList = null;
-			}
-			ic = new FissionTrackCntrImageCanvas(counterImg, typeVector, this, displayList);
-			new StackWindow(counterImg, ic);
+
 		}
+
 		
 		Calibration cal = img.getCalibration();	//	to conserve voxel size of the original image
 		counterImg.setCalibration(cal);
