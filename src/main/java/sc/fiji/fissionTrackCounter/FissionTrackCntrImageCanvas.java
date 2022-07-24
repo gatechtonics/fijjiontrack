@@ -101,11 +101,15 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 		final int y = super.offScreenY(e.getY());
 		Overlay overlay = img.getOverlay();
 		Roi roi = overlay.get(0);
+
+
 		if (!roimode) {
 			if (!delmode) {
 				if (roi!=null && !roi.containsPoint(x, y)) {
 					IJ.error("The point is outside of ROI");
 				} else {
+//					IJ.run("Measure");
+
 					//Add one marker on screen
 					if( currentMarkerVector.getType() != 5 || currentMarkerVector.getcAxis()) {
 						System.out.println(currentMarkerVector.getcAxis());

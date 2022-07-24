@@ -94,6 +94,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	private static final String MEASURE = "Mount/Mica Count";
 
 	private static final String MEASURE2 = "2D/3D Distances";
+	private static final String MEASURE3 = "Roi Area";
 	private static final String ROIMODIFY = "Drag ROI";
 
 	private static final String TYPE_COMMAND_PREFIX = "type";
@@ -129,6 +130,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	private JButton removeButton;
 	private JButton renameButton;
 	private JButton initializeButton;
+
 //	private JButton optionsButton;
 	private JButton resultsButton;
 	private JButton unDoButton;
@@ -140,6 +142,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	private JButton exportimgButton;
 	private JButton measureButton;
 	private JButton measure2Button;
+	private JButton measureRoiArea;
 
 	private boolean keepOriginal = false;
 
@@ -446,10 +449,18 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		statButtonPanel.add(measureButton);
 
 		measure2Button =
-				makeButton(MEASURE2, "Measure pixel intensity of marker points");
+				makeButton(MEASURE2, "Measure 2d/3d distance ");
 		measure2Button.setEnabled(false);
 		gb.setConstraints(measure2Button, gbc);
 		statButtonPanel.add(measure2Button);
+
+		measureRoiArea =
+				makeButton(MEASURE3, "Measure the area of roi");
+		measureRoiArea.setEnabled(true);
+		gb.setConstraints(measureRoiArea, gbc);
+		statButtonPanel.add(measureRoiArea);
+
+
 
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -748,6 +759,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		exportimgButton.setEnabled(true);
 		measureButton.setEnabled(true);
 		measure2Button.setEnabled(true);
+		measureRoiArea.setEnabled(false);
 
 	}
 
@@ -850,6 +862,9 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 			measure();
 		} else if (command.equals(MEASURE2)) {
 			measure2();
+		} else if(command.equals(MEASURE3)){
+			IJ.run("Measure");
+
 		}
 		if (ic != null) ic.repaint();
 		populateTxtFields();
