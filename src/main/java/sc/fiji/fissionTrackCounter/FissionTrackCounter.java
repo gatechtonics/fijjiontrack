@@ -33,6 +33,7 @@ import ij.gui.Roi;
 import ij.gui.StackWindow;
 import ij.measure.Calibration;
 import ij.process.ImageProcessor;
+import ij.plugin.frame.RoiManager;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -87,7 +88,8 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	private static final String SHOWALL = "Show All";
 	private static final String RESET = "Reset";
 	private static final String RESETCAIXS = "ResetCAxis";
-
+	private static final String GRID = "Grid Panel"
+;
 	private static final String EXPORTMARKERS = "Save Markers";
 	private static final String LOADMARKERS = "Load Markers";
 	private static final String EXPORTIMG = "Export Image";
@@ -143,6 +145,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	private JButton measureButton;
 	private JButton measure2Button;
 	private JButton measureRoiArea;
+	private JButton gridButton;
 
 	private boolean keepOriginal = false;
 
@@ -309,6 +312,11 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		initializeButton = makeButton(INITIALIZE, "Initialize image to count");
 		gb.setConstraints(initializeButton, gbc);
 		statButtonPanel.add(initializeButton);
+		gridButton = makeButton(GRID, "Place grid over the image");
+		gb.setConstraints(gridButton, gbc);
+		gridButton.setEnabled(false);
+		statButtonPanel.add(gridButton);
+
 
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -638,11 +646,15 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 
 	private void initializeImage() {
 		reset();
+		//resetCAxis();
 		img = WindowManager.getCurrentImage();
 		final boolean v139t = IJ.getVersion().compareTo("1.39t") >= 0;
 		if (img == null) {
 			IJ.noImage();
+
 		}else {
+			IJ.run("Brightness/Contrast...","Auto");
+
 
 			if (img.getStackSize() == 1) {
 
@@ -760,6 +772,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		measureButton.setEnabled(true);
 		measure2Button.setEnabled(true);
 		measureRoiArea.setEnabled(false);
+		gridButton.setEnabled(true);
 
 	}
 
@@ -862,8 +875,11 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 			measure();
 		} else if (command.equals(MEASURE2)) {
 			measure2();
-		} else if(command.equals(MEASURE3)){
+		} else if (command.equals(MEASURE3)){
 			IJ.run("Measure");
+
+		} else if (command.equals(GRID)){
+			IJ.run("Grid...");
 
 		}
 		if (ic != null) ic.repaint();
@@ -936,7 +952,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	}
 
  	public void reset() {
-
+		resetCAxis();
 		if (typeVector.size() < 1) {
 			return;
 		}

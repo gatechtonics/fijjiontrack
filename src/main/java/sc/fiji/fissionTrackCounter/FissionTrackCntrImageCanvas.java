@@ -108,8 +108,6 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 				if (roi!=null && !roi.containsPoint(x, y)) {
 					IJ.error("The point is outside of ROI");
 				} else {
-//					IJ.run("Measure");
-
 					//Add one marker on screen
 					if( currentMarkerVector.getType() != 5 || currentMarkerVector.getcAxis()) {
 						System.out.println(currentMarkerVector.getcAxis());
@@ -142,8 +140,8 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 						currentsmallest = m;
 					}
 				}
-
 				currentMarkerVector.remove(currentsmallest);
+
 //				currentMarkerVector.redNum();
 
 
@@ -185,7 +183,10 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 			Roi roi = overlay.get(0);
 			roi.setLocation(e.getX(), e.getY());
 			roi.mouseDragged(e);
+		} else if(!roimode && !delmode){
+
 		}
+
 		repaint();
 		cc.populateTxtFields();
 	}
