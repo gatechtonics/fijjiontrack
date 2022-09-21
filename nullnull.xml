@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CellCounter_Marker_File>
  <Image_Properties>
-     <Image_Filename>Untitled-1.jpg</Image_Filename>
+     <Image_Filename>TestingPicture2.png</Image_Filename>
      <X_Calibration>1.0</X_Calibration>
      <Z_Calibration>1.0</Z_Calibration>
      <Calibration_Unit>pixel</Calibration_Unit>
@@ -13,24 +13,22 @@
          <Type>1</Type>
          <Name>Type 1</Name>
          <Marker>
-             <MarkerX>834</MarkerX>
-             <MarkerY>1272</MarkerY>
+             <MarkerX>840</MarkerX>
+             <MarkerY>680</MarkerY>
              <MarkerZ>1</MarkerZ>
+				<MarkerID>1</MarkerID>
          </Marker>
          <Marker>
-             <MarkerX>354</MarkerX>
-             <MarkerY>1284</MarkerY>
+             <MarkerX>786</MarkerX>
+             <MarkerY>596</MarkerY>
              <MarkerZ>1</MarkerZ>
+				<MarkerID>2</MarkerID>
          </Marker>
          <Marker>
-             <MarkerX>741</MarkerX>
-             <MarkerY>1470</MarkerY>
+             <MarkerX>1028</MarkerX>
+             <MarkerY>734</MarkerY>
              <MarkerZ>1</MarkerZ>
-         </Marker>
-         <Marker>
-             <MarkerX>945</MarkerX>
-             <MarkerY>1593</MarkerY>
-             <MarkerZ>1</MarkerZ>
+				<MarkerID>3</MarkerID>
          </Marker>
      </Marker_Type>
      <Marker_Type>

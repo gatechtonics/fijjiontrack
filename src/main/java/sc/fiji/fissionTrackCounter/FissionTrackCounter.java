@@ -32,6 +32,8 @@ import ij.gui.Overlay;
 import ij.gui.Roi;
 import ij.gui.StackWindow;
 import ij.measure.Calibration;
+import ij.measure.ResultsTable;
+import ij.plugin.filter.Analyzer;
 import ij.process.ImageProcessor;
 import ij.plugin.frame.RoiManager;
 
@@ -58,12 +60,14 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.EtchedBorder;
 
+import ij.process.ImageStatistics;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.layout.VBox;
 import org.scijava.Context;
 import org.scijava.command.CommandService;
+import org.scijava.options.OptionsService;
 
 /**
  * TODO
@@ -72,6 +76,7 @@ import org.scijava.command.CommandService;
  */
 public class FissionTrackCounter extends JFrame implements ActionListener, ItemListener
 {
+	private static int RoiArea;
 
 	private static final String ADD = "Add";
 	private static final String REMOVE = "Remove";
@@ -88,17 +93,14 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	private static final String SHOWALL = "Show All";
 	private static final String RESET = "Reset";
 	private static final String RESETCAIXS = "ResetCAxis";
-	private static final String GRID = "Grid Panel"
-;
+	private static final String GRID = "Grid Panel";
 	private static final String EXPORTMARKERS = "Save Markers";
 	private static final String LOADMARKERS = "Load Markers";
 	private static final String EXPORTIMG = "Export Image";
-	private static final String MEASURE = "Mount/Mica Count";
-
-	private static final String MEASURE2 = "2D/3D Distances";
-	private static final String MEASURE3 = "Roi Area";
+	private static final String MEASURE = "Detail";
+	private static final String MEASURE3 = "Summary";
+	private static final String CHANGECOLOR = "Change Color";
 	private static final String ROIMODIFY = "Drag ROI";
-
 	private static final String TYPE_COMMAND_PREFIX = "type";
 
 	private Vector<FissionTrackCntrMarkerVector> typeVector;
@@ -112,7 +114,6 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	private Map<String,String> metaData = new HashMap<>();
 
 	private JPanel dynPanel;
-
 	private JPanel dynButtonPanel;
 	private JPanel statButtonPanel;
 	private JPanel autoPanel;
@@ -125,6 +126,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	private JCheckBox showAllCheck;
 	//option for Mica/Mount Counter
 	private JCheckBox uniqueID;
+
 	private ButtonGroup radioGrp;
 	private ButtonGroup autoButtonGrp;
 	private JSeparator separator;
@@ -143,8 +145,9 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	private JButton loadButton;
 	private JButton exportimgButton;
 	private JButton measureButton;
-	private JButton measure2Button;
-	private JButton measureRoiArea;
+	private JButton measure3Button;
+	private JButton colorButton;
+
 	private JButton gridButton;
 
 	private boolean keepOriginal = false;
@@ -153,10 +156,10 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 
 	private ImagePlus img;
 	private ImagePlus counterImg;
-
 	private GridLayout dynGrid;
-
+	private FissionTrackCounterOptions options = new FissionTrackCounterOptions();
 	static FissionTrackCounter instance;
+
 
 	public FissionTrackCounter() {
 		super("Fijjiontrack");
@@ -295,14 +298,10 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		//Check for consistent/inconsistent count for marker
 		uniqueID = new JCheckBox(UNIMODE);
 		uniqueID.setToolTipText("Unique Marker ID");
-		uniqueID.setSelected(true);
+		uniqueID.setSelected(false);
 		uniqueID.addItemListener(this);
 		gb.setConstraints(uniqueID, gbc);
 		statButtonPanel.add(uniqueID);
-
-
-
-
 
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -456,18 +455,17 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		gb.setConstraints(measureButton, gbc);
 		statButtonPanel.add(measureButton);
 
-		measure2Button =
-				makeButton(MEASURE2, "Measure 2d/3d distance ");
-		measure2Button.setEnabled(false);
-		gb.setConstraints(measure2Button, gbc);
-		statButtonPanel.add(measure2Button);
 
-		measureRoiArea =
-				makeButton(MEASURE3, "Measure the area of roi");
-		measureRoiArea.setEnabled(true);
-		gb.setConstraints(measureRoiArea, gbc);
-		statButtonPanel.add(measureRoiArea);
+		measure3Button =
+				makeButton(MEASURE3, "Measure frequency");
+		measure3Button.setEnabled(false);
+		gb.setConstraints(measure3Button, gbc);
+		statButtonPanel.add(measure3Button);
 
+		colorButton = makeButton(CHANGECOLOR, "Change color");
+		colorButton.setEnabled(false);
+		gb.setConstraints(colorButton, gbc);
+		statButtonPanel.add(colorButton);
 
 
 		gbc = new GridBagConstraints();
@@ -562,26 +560,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		gb.setConstraints(separator, gbc);
 		statButtonPanel.add(separator);
 
-//		gbc = new GridBagConstraints();
-//		gbc.anchor = GridBagConstraints.NORTHWEST;
-//		gbc.fill = GridBagConstraints.BOTH;
-//		gbc.gridx = 0;
-//		gbc.gridwidth = GridBagConstraints.REMAINDER;
-//		measureButton =
-//			makeButton(MEASURE, "Measure pixel intensity of marker points");
-//		measureButton.setEnabled(false);
-//		gb.setConstraints(measureButton, gbc);
-//		statButtonPanel.add(measureButton);
-//
-//		measure2Button =
-//				makeButton(MEASURE2, "Measure pixel intensity of marker points");
-//		measure2Button.setEnabled(false);
-//		gb.setConstraints(measure2Button, gbc);
-//		statButtonPanel.add(measure2Button);
-
 		gbc = new GridBagConstraints();
-		//gbc.anchor = GridBagConstraints.NORTHWEST;
-		//gbc.fill = GridBagConstraints.NONE;
 		gbc.ipadx = 5;
 		gbc.gridx = 0;
 		gbc.gridy = 3;
@@ -651,26 +630,22 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		final boolean v139t = IJ.getVersion().compareTo("1.39t") >= 0;
 		if (img == null) {
 			IJ.noImage();
-
 		}else {
 			IJ.run("Brightness/Contrast...","Auto");
-
-
+			Roi roi = img.getRoi();
+			ImageProcessor ip = img.getProcessor();
+			ip.setRoi(roi);
+			ImageStatistics is = ip.getStatistics();
+			RoiArea = is.pixelCount;
+			System.out.println(RoiArea);
+			System.out.println(is.pixelCount);
 			if (img.getStackSize() == 1) {
-
-
-				ImageProcessor ip = img.getProcessor();
-				//ip.resetRoi();
-
 				if (keepOriginal) ip = ip.crop();
-				//if(true) ip = ip.crop();
 				counterImg = new ImagePlus("Counter Window - " + img.getTitle(), ip);
-
 				@SuppressWarnings("unchecked")
 				Overlay displayList;
 				if (v139t) {
 					displayList = new Overlay();
-					Roi roi = img.getRoi();
 					displayList.add(roi);
 					displayList.setStrokeColor(Color.white);
 				}
@@ -679,34 +654,13 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 				}
 				ic = new FissionTrackCntrImageCanvas(counterImg, typeVector, this, displayList);
 				new ImageWindow(counterImg, ic);
-
-
-
-//				ScrollBar scroll = new ScrollBar();
-//				scroll.setMin(0);
-//				scroll.setOrientation(Orientation.VERTICAL);
-//				scroll.setPrefHeight(200);
-//				scroll.setPrefWidth(20);
-				// create a Group
-//				Group group = new Group(ic);
-//
-//				// create a scene
-//				Scene scene = new Scene(group, 400, 400);
-//
-//				// set the scene
-//				stage.setScene(scene);
-//
-//				stage.show();
-
-
-
 			}
 			else if (img.getStackSize() > 1) {
 				final ImageStack stack = img.getStack();
 				final int size = stack.getSize();
 				final ImageStack counterStack = img.createEmptyStack();
 				for (int i = 1; i <= size; i++) {
-					ImageProcessor ip = stack.getProcessor(i);
+					ip = stack.getProcessor(i);
 					if (keepOriginal) ip = ip.crop();
 					counterStack.addSlice(stack.getSliceLabel(i), ip);
 				}
@@ -725,7 +679,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 				Overlay displayList;
 				if (v139t) {
 					displayList = new Overlay();
-					Roi roi = img.getRoi();
+					roi = img.getRoi();
 					displayList.add(roi);
 					displayList.setStrokeColor(Color.white);
 
@@ -736,6 +690,8 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 				ic = new FissionTrackCntrImageCanvas(counterImg, typeVector, this, displayList);
 				new StackWindow(counterImg, ic);
 			}
+			ic.setRoiArea(RoiArea);
+			initializeColor();
 
 		}
 
@@ -770,8 +726,8 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		exportButton.setEnabled(true);
 		exportimgButton.setEnabled(true);
 		measureButton.setEnabled(true);
-		measure2Button.setEnabled(true);
-		measureRoiArea.setEnabled(false);
+		measure3Button.setEnabled(true);
+		colorButton.setEnabled(true);
 		gridButton.setEnabled(true);
 
 	}
@@ -854,9 +810,6 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		else if (command.equals(RESETCAIXS)){
 			resetCAxis();
 		}
-//		else if (command.equals(OPTIONS)) {
-//			options();
-//		}
 		else if (command.equals(RESULTS)) {
 			report();
 		}
@@ -873,14 +826,15 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		}
 		else if (command.equals(MEASURE)) {
 			measure();
-		} else if (command.equals(MEASURE2)) {
-			measure2();
-		} else if (command.equals(MEASURE3)){
-			IJ.run("Measure");
-
+		}else if(command.equals(MEASURE3)) {
+			measure3();
+		} else if (command.equals(CHANGECOLOR)) {
+			int type = typeVector.indexOf(currentMarkerVector) + 1;
+			System.out.println(typeVector.indexOf(currentMarkerVector));
+			changeColor(type);
+			ic.repaint();
 		} else if (command.equals(GRID)){
 			IJ.run("Grid...");
-
 		}
 		if (ic != null) ic.repaint();
 		populateTxtFields();
@@ -947,8 +901,11 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		ic.measure();
 	}
 
-	public void measure2() {
-		ic.measure2();
+//	public void measure2() {
+//		ic.measure2();
+//	}
+	public void measure3() {
+		ic.measure3();
 	}
 
  	public void reset() {
@@ -1054,6 +1011,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		final String storedfilename =
 			rxml.readImgProperties(ReadXML.IMAGE_FILE_PATH);
 		if (storedfilename.equals(img.getTitle())) {
+			System.out.println("Go to the if statement");
 			final Vector<FissionTrackCntrMarkerVector> loadedvector = rxml.readMarkerData();
 			typeVector = loadedvector;
 			ic.setTypeVector(typeVector);
@@ -1119,6 +1077,11 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		final WriteXML wxml = new WriteXML(filePath);
 		wxml.writeXML(img.getTitle(), typeVector, typeVector
 			.indexOf(currentMarkerVector), metaData);
+		System.out.println(typeVector);
+		System.out.println(typeVector
+				.indexOf(currentMarkerVector));
+
+
 	}
 
 	public static final int SAVE = FileDialog.SAVE, OPEN = FileDialog.LOAD;
@@ -1179,6 +1142,22 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		instance.radioGrp.setSelected(rbutton.getModel(), true);
 		instance.currentMarkerVector = instance.typeVector.get(index);
 		instance.ic.setCurrentMarkerVector(instance.currentMarkerVector);
+	}
+
+	public Color getColor(int type) {
+		final Context c = (Context) IJ.runPlugIn("org.scijava.Context", "");
+		final OptionsService optionsService = c.service(OptionsService.class);
+//		final FissionTrackCounterOptions options =
+//			optionsService.getOptions(FissionTrackCounterOptions.class);
+
+		return options.getColor(type);
+//		return options.getColor(type);
+	}
+	public void changeColor(int type){
+		options.setColor(type);
+	}
+	public void initializeColor() {
+		options.initializeColor();
 	}
 
 }
