@@ -43,14 +43,15 @@ public class FissionTrackCntrMarkerVector extends Vector<FissionTrackCntrMarker>
 
 	private int type;
 	private String name;
-	private int num;//number of marker marker in the vector
-	private int uniuqeID;
+	private int num;//number of markers in the vector
+	private int uniqueID;
 	/**
 	 * If C-AXIS is ready to be drawn
 	 * True: cAxis is ready to be drawn
 	 * False: cAxis isn't ready to be drawn
 	 */
 	private boolean cAxis;
+
 
 	/** Creates a new instance of MarkerVector */
 	public FissionTrackCntrMarkerVector(final int type) {
@@ -62,13 +63,13 @@ public class FissionTrackCntrMarkerVector extends Vector<FissionTrackCntrMarker>
 		super();
 		this.type = type;
 		this.name = name;
-		this.uniuqeID = 0;
+		this.uniqueID = 0;
 		this.cAxis = true;
 	}
 
 	public void addMarker(final FissionTrackCntrMarker marker) {
 		add(marker);
-		uniuqeID++;
+		uniqueID++;
 	}
 
 	public FissionTrackCntrMarker getMarker(final int n) {
@@ -84,7 +85,7 @@ public class FissionTrackCntrMarkerVector extends Vector<FissionTrackCntrMarker>
 	}
 
 	public void resetID(){
-		this.uniuqeID = 0;
+		this.uniqueID = 0;
 	}
 
 	//Method to celar all the CAxis on image cAxis
@@ -94,7 +95,7 @@ public class FissionTrackCntrMarkerVector extends Vector<FissionTrackCntrMarker>
 		return cAxis;
 	}
 
-	public int getUniuqeID() {return uniuqeID;}
+	public int getUniqueID() {return uniqueID;}
 	//
 	public void setcAxis(boolean cAxis) {
 		this.cAxis = cAxis;
@@ -150,12 +151,5 @@ public class FissionTrackCntrMarkerVector extends Vector<FissionTrackCntrMarker>
 		this.name = name;
 	}
 
-	public Color getColor() {
-		final Context c = (Context) IJ.runPlugIn("org.scijava.Context", "");
-		final OptionsService optionsService = c.service(OptionsService.class);
-		final FissionTrackCounterOptions options =
-			optionsService.getOptions(FissionTrackCounterOptions.class);
-		return options.getColor(type);
-	}
 
 }
