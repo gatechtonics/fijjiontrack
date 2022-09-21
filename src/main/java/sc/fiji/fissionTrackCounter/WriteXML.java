@@ -107,10 +107,12 @@ public class WriteXML {
 					final int x = marker.getX();
 					final int y = marker.getY();
 					final int z = marker.getZ();
+					final int ID = marker.getID();
 					out.write("         <Marker>\r\n");
 					out.write("             <MarkerX>" + x + "</MarkerX>\r\n");
 					out.write("             <MarkerY>" + y + "</MarkerY>\r\n");
 					out.write("             <MarkerZ>" + z + "</MarkerZ>\r\n");
+					out.write("				<MarkerID>" + ID + "</MarkerID>\r\n");
 					out.write("         </Marker>\r\n");
 				}
 				out.write("     </Marker_Type>\r\n");

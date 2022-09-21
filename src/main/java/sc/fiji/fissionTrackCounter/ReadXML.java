@@ -118,10 +118,12 @@ public class ReadXML {
 					markerElement.getElementsByTagName("MarkerY");
 				final NodeList markerZNodeList =
 					markerElement.getElementsByTagName("MarkerZ");
+				final NodeList markerIDNodeList = markerElement.getElementsByTagName("MarkerID");
 				final FissionTrackCntrMarker marker = new FissionTrackCntrMarker();
 				marker.setX(Integer.parseInt(readValue(markerXNodeList, 0)));
 				marker.setY(Integer.parseInt(readValue(markerYNodeList, 0)));
 				marker.setZ(Integer.parseInt(readValue(markerZNodeList, 0)));
+				marker.setID(Integer.parseInt(readValue(markerIDNodeList, 0)));
 				markerVector.add(marker);
 			}
 			typeVector.add(markerVector);

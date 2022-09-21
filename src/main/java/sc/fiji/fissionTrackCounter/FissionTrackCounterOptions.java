@@ -24,6 +24,7 @@ package sc.fiji.fissionTrackCounter;
 
 import java.awt.Color;
 
+
 import org.scijava.options.OptionsPlugin;
 import org.scijava.plugin.Attr;
 import org.scijava.plugin.Parameter;
@@ -32,6 +33,11 @@ import org.scijava.ui.awt.AWTColors;
 import org.scijava.util.ColorRGB;
 import org.scijava.util.Colors;
 
+import javax.swing.*;
+import javax.swing.colorchooser.ColorSelectionModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 /**
  * Options for the Cell Counter plugin.
  *
@@ -39,54 +45,57 @@ import org.scijava.util.Colors;
  */
 @Plugin(type = OptionsPlugin.class, label = "Cell Counter Options",
 	attrs = { @Attr(name = "legacy-only") })
-public class FissionTrackCounterOptions extends OptionsPlugin {
+public class FissionTrackCounterOptions extends JFrame{
 
 	// -- Fields --
 
 	@Parameter
-	private ColorRGB color1 = Colors.CYAN;
+	private Color color1;
 
 	@Parameter
-	private ColorRGB color2 = Colors.BLUE;
+	private Color color2;
 
 	@Parameter
-	private ColorRGB color3 = Colors.ROYALBLUE;
+	private Color color3;
 
 	@Parameter
-	private ColorRGB color4 = Colors.LIGHTGREEN;
+	private Color color4;
 
 	@Parameter
-	private ColorRGB color5 = Colors.ORANGE;
+	private Color color5;
 
 	@Parameter
-	private ColorRGB color6 = Colors.PINK;
+	private Color color6;
 
 	@Parameter
-	private ColorRGB color7 = Colors.RED;
+	private Color color7;
+	private boolean init;
 
 	@Parameter
-	private ColorRGB color8 = Colors.YELLOW;
+	private Color color8;
+	private JColorChooser tcc = new JColorChooser();
 
 	// -- Option accessors --
 
 	public Color getColor(final int id) {
+
 		switch (id) {
 			case 1:
-				return AWTColors.getColor(Colors.CYAN);
+				return color1;
 			case 2:
-				return AWTColors.getColor(Colors.BLUE);
+				return color2;
 			case 3:
-				return AWTColors.getColor(Colors.ROYALBLUE);
+				return color3;
 			case 4:
-				return AWTColors.getColor(Colors.LIGHTGREEN);
+				return color4;
 			case 5:
-				return AWTColors.getColor(color5);
+				return color5;
 			case 6:
-				return AWTColors.getColor(color6);
+				return color6;
 			case 7:
-				return AWTColors.getColor(color7);
+				return color7;
 			case 8:
-				return AWTColors.getColor(color8);
+				return color8;
 			default:
 				Color c;
 				do {
@@ -106,5 +115,46 @@ public class FissionTrackCounterOptions extends OptionsPlugin {
 				return c;
 		}
 	}
+
+	public void initializeColor(){
+		System.out.println("success initialize color");
+		color1 = AWTColors.getColor(Colors.CYAN);
+		color2 = AWTColors.getColor(Colors.BLUE);
+		color3 = AWTColors.getColor(Colors.ROYALBLUE);
+		color4 = AWTColors.getColor(Colors.LIGHTGREEN);
+		color5 = AWTColors.getColor(Colors.ORANGE);
+		color6 = AWTColors.getColor(Colors.PINK);
+		color7 = AWTColors.getColor(Colors.RED);
+		color8 = AWTColors.getColor(Colors.YELLOW);
+
+
+	}
+	public void setColor(final int id) {
+		Color initialColor = AWTColors.getColor(Colors.CYAN);
+		System.out.println(initialColor.toString());
+		Color color=JColorChooser.showDialog(this,"Select a color",initialColor);
+		System.out.println(color.toString());
+		System.out.println(id);
+
+		switch (id) {
+			case 1:
+				this.color1 = color;
+				break;
+			case 2:
+				this.color2 = color;
+				break;
+			case 3:
+				this.color3 = color;
+				break;
+			case 4:
+				this.color4 = color;
+				break;
+			case 5:
+				this.color5 = color;
+				break;
+		}
+
+	}
+
 
 }
