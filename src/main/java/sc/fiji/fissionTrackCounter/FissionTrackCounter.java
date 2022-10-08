@@ -637,8 +637,6 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 			ip.setRoi(roi);
 			ImageStatistics is = ip.getStatistics();
 			RoiArea = is.pixelCount;
-			System.out.println(RoiArea);
-			System.out.println(is.pixelCount);
 			if (img.getStackSize() == 1) {
 				if (keepOriginal) ip = ip.crop();
 				counterImg = new ImagePlus("Counter Window - " + img.getTitle(), ip);
@@ -792,7 +790,6 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		else if (command.startsWith(TYPE_COMMAND_PREFIX)) { // COUNT
 			currentMarkerIndex =
 				Integer.parseInt(command.substring(TYPE_COMMAND_PREFIX.length())) - 1;
-			//System.out.println(currentMarkerIndex);
 			if (ic == null) {
 				IJ.error("You need to initialize first");
 				return;
@@ -830,7 +827,6 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 			measure3();
 		} else if (command.equals(CHANGECOLOR)) {
 			int type = typeVector.indexOf(currentMarkerVector) + 1;
-			System.out.println(typeVector.indexOf(currentMarkerVector));
 			changeColor(type);
 			ic.repaint();
 		} else if (command.equals(GRID)){
@@ -953,7 +949,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		final ListIterator<JRadioButton> it = dynRadioVector.listIterator();
 		while (it.hasNext()) {
 			final JRadioButton button = it.next();
-			final String str = button.getText(); // System.out.println(str);
+			final String str = button.getText();
 			labels = labels.concat(str + "\t");
 		}
 		labels = labels.concat("\tC-pos\tZ-pos\tT-pos\t");						// add new columns containing C,Z,T positions
@@ -1011,7 +1007,6 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		final String storedfilename =
 			rxml.readImgProperties(ReadXML.IMAGE_FILE_PATH);
 		if (storedfilename.equals(img.getTitle())) {
-			System.out.println("Go to the if statement");
 			final Vector<FissionTrackCntrMarkerVector> loadedvector = rxml.readMarkerData();
 			typeVector = loadedvector;
 			ic.setTypeVector(typeVector);
@@ -1078,10 +1073,6 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		final WriteXML wxml = new WriteXML(filePath);
 		wxml.writeXML(img.getTitle(), typeVector, typeVector
 			.indexOf(currentMarkerVector), metaData);
-		System.out.println(typeVector);
-		System.out.println(typeVector
-				.indexOf(currentMarkerVector));
-
 
 	}
 
