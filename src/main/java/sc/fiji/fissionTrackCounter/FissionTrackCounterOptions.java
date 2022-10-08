@@ -117,7 +117,6 @@ public class FissionTrackCounterOptions extends JFrame{
 	}
 
 	public void initializeColor(){
-		System.out.println("success initialize color");
 		color1 = AWTColors.getColor(Colors.CYAN);
 		color2 = AWTColors.getColor(Colors.BLUE);
 		color3 = AWTColors.getColor(Colors.ROYALBLUE);
@@ -131,10 +130,7 @@ public class FissionTrackCounterOptions extends JFrame{
 	}
 	public void setColor(final int id) {
 		Color initialColor = AWTColors.getColor(Colors.CYAN);
-		System.out.println(initialColor.toString());
 		Color color=JColorChooser.showDialog(this,"Select a color",initialColor);
-		System.out.println(color.toString());
-		System.out.println(id);
 
 		switch (id) {
 			case 1:

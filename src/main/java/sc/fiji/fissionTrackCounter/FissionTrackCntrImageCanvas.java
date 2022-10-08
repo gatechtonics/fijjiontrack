@@ -250,7 +250,6 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 						g2.drawOval((int) xM - 2, (int) yM - 2, 4, 4);
 
 
-//					System.out.println(typeID + ",");
 						//Show the consistentCount number of the
 						if (showNumbers) {
 							if (!uniqueMarkerID) {
@@ -266,7 +265,6 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 					}
 					//C-Axis
 					else if (typeID == 5) {
-//					System.out.println(cflag);
 						if (cflag) {
 							g2.drawLine((int) x, (int) y, (int) xM, (int) yM);
 							cAxisVal = 90 - atan(Math.abs(yM - y) / Math.abs(xM - x)) * 180 / PI;
@@ -387,13 +385,11 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 								//Math equation to get value of funciton
 								//*Need to assign final after check
 								vAngle = 90 - atan(Math.abs(yMcal - y)/ Math.abs(xMcal - x))* 180 / PI;
-//								System.out.println(vAngle);
 								String angle = type.equals("2D") ? String.format("%.3f",vAngle) : "NA";
 								if(cAxisVal != -361){
 									//!!Check, the angle is negative
 									cAngle = String.format("%.3f", distance* Math.cos(Math.toRadians( Math.abs(cAxisVal - vAngle))));
 								}
-//								System.out.println("cAxis:"+ mv.getcAxis() + "type" + type);
 								String C_axisAngle = type.equals("2D") ? cAngle : "NA";
 								String resultsRow = String.format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%.3f\t%.3f\t%.3f\t%.3f\t%s\t%s",type,"NA", "NA", "NA","NA", "NA", "NA", "NA",xMcal,yMcal,zMcal,distance, angle,C_axisAngle);
 								IJ.write(resultsRow);
