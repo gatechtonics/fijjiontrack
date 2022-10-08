@@ -375,7 +375,7 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 						final double yMcal 	= yM * cal.pixelHeight;
 						final double zMcal 	= (zPos-1) * cal.pixelDepth; 		// zPos instead of zM , start at 1 while should start at 0.
 						if (typeID <= 2) {
-							String resultsRow = String.format("%s\t%d\t%d\t%d\t%f\t%d\t%d\t%d\t%.3f\t%.3f\t%.3f", typeID == 2 ? "Mica" : "Mount", zM, yM, xM, value, channel, zPos, frame, xMcal, yMcal, zMcal);
+							String resultsRow = String.format("%s\t%d\t%d\t%d\t%f\t%d\t%d\t%d\t%.3f\t%.3f\t%.3f", typeID == 2 ? "Mica" : "Mount", zM, xM, yM, value, channel, zPos, frame, xMcal, yMcal, zMcal);
 							IJ.write(resultsRow);
 						}
 						else{

@@ -1068,6 +1068,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		else {
 			IJ.error("These Markers do not belong to the current image");
 		}
+        ic.repaint();
 	}
 
 	public void exportMarkers() {
