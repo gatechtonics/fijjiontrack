@@ -1,6 +1,6 @@
 # Fijjiontrack
 Hi, welcome to fijjiontrack! \
-Fijjiontrack is a software plugin for Fiji to customize geologists' experience in counting and analyzing fission-tracks.
+Fijjiontrack is an ImgaeJ plugin for fission-track analysis.
 
 ## Find Jar File
 You can find our jar file Fission_Track_Counter-1.0.1.jar on the main page. \
