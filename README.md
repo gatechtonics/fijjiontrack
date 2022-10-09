@@ -1,5 +1,5 @@
 # Fijjiontrack
-Hi, welcome to fijjiontrack! \
+Hi, welcome! \
 Fijjiontrack is an ImgaeJ plugin for fission-track analysis.
 
 ## Find Jar File
