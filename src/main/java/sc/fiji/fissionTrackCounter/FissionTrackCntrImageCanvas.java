@@ -52,8 +52,8 @@ import static java.lang.Math.atan;
 
 /**
  * TODO
- *
  * @author Kurt De Vos
+ * @author Ziya Ye
  */
 public class FissionTrackCntrImageCanvas extends ImageCanvas {
 
@@ -79,8 +79,6 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 		this.img = img;
 		this.typeVector = typeVector;
 		this.cc = cc;
-
-		//if (displayList != null) this.setDisplayList(displayList);
 		if (displayList != null) this.setOverlay(displayList);
 
 	}

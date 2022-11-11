@@ -46,6 +46,7 @@ import java.util.ListIterator;
 import java.util.Vector;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -71,14 +72,13 @@ import org.scijava.options.OptionsService;
 
 /**
  * TODO
- *
  * @author Kurt De Vos
+ * @author Ziya Ye
  */
 public class FissionTrackCounter extends JFrame implements ActionListener, ItemListener
 {
 	private static int RoiArea;
 
-	private static final String ADD = "Add";
 	private static final String REMOVE = "Remove";
 	private static final String RENAME = "Rename";
 	private static final String INITIALIZE = "Initialize";
@@ -102,6 +102,10 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	private static final String CHANGECOLOR = "Change Color";
 	private static final String ROIMODIFY = "Drag ROI";
 	private static final String TYPE_COMMAND_PREFIX = "type";
+	private static final String THRESHOLD = "Threshold";
+	private static final String AITRACKTIVE = "AiTracktive";
+	private static final String SKELETRACKS = "Skeletracks";
+	private static final String AUTOCOUNT = "AutoCount";
 
 	private Vector<FissionTrackCntrMarkerVector> typeVector;
 	private Vector<JRadioButton> dynRadioVector;
@@ -109,6 +113,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	private FissionTrackCntrMarkerVector markerVector;
 	private FissionTrackCntrMarkerVector currentMarkerVector;
 	private int currentMarkerIndex;
+	private Roi storedRoi;
 		
 	// Map<key,value> for storing metadata to write with WriteXML
 	private Map<String,String> metaData = new HashMap<>();
@@ -130,10 +135,13 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	private ButtonGroup radioGrp;
 	private ButtonGroup autoButtonGrp;
 	private JSeparator separator;
-	private JButton addButton;
 	private JButton removeButton;
 	private JButton renameButton;
 	private JButton initializeButton;
+	private JButton thresholdButton;
+	private JButton aiTracktiveButton;
+	private JButton skeletracksButton;
+	private JButton autoCountButton;
 
 //	private JButton optionsButton;
 	private JButton resultsButton;
@@ -207,20 +215,27 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 
 		// this panel keeps the radiobuttons
 		autoButtonPanel = new JPanel();
-		GridLayout grid = new GridLayout(2, 1);
+		GridLayout grid = new GridLayout(4, 1);
 		grid.setVgap(2);
 		autoButtonPanel.setLayout(grid);
 
 		GridBagConstraints gbc1 = new GridBagConstraints();
 		gbc1.anchor = GridBagConstraints.NORTHWEST;
 		gbc1.fill = GridBagConstraints.BOTH;
-		gbc1.ipadx = 0;
+		gbc1.ipadx = 5;
 		gbc1.gridy = 1;
 		gb.setConstraints(autoPanel, gbc1);
 		autoPanel.add(autoButtonPanel);
+		aiTracktiveButton = makeButton(AITRACKTIVE, "Apply AiTracktive to image");
+		autoButtonPanel.add(aiTracktiveButton);
+		skeletracksButton = makeButton(SKELETRACKS, "Apply Skeletracks to image");
+		autoButtonPanel.add(skeletracksButton);
+		thresholdButton = makeButton(THRESHOLD, "Apply threshold to image");
+		autoButtonPanel.add(thresholdButton);
+		autoCountButton = makeButton(AUTOCOUNT, "Auto Count fission tracks according to threshold");
+		autoButtonPanel.add(autoCountButton);
 
-		autoButtonPanel.add(makeAutoRadioButton("AiTracktive"));
-		autoButtonPanel.add(makeAutoRadioButton("Skeletracks"));
+
 		getContentPane().add(autoPanel);
 
 
@@ -240,6 +255,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.ipadx = 10;
 		gb.setConstraints(dynButtonPanel, gbc);
+		gb.setConstraints(autoButtonPanel,gbc);
 		dynPanel.add(dynButtonPanel);
 
 		// this panel keeps the score
@@ -283,6 +299,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		statButtonPanel = new JPanel();
 		statButtonPanel.setBorder(BorderFactory.createTitledBorder("Actions"));
 		statButtonPanel.setLayout(gb);
+//		autoButtonPanel.setLayout(gb);
 
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -315,6 +332,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		gb.setConstraints(gridButton, gbc);
 		gridButton.setEnabled(false);
 		statButtonPanel.add(gridButton);
+//
 
 
 		gbc = new GridBagConstraints();
@@ -333,9 +351,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.gridx = 0;
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
-		addButton = makeButton(ADD, "add a counter type");
-		gb.setConstraints(addButton, gbc);
-		//statButtonPanel.add(addButton); REMOVED THE ADD BUTTON
+
 
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -631,8 +647,8 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		if (img == null) {
 			IJ.noImage();
 		}else {
-			IJ.run("Brightness/Contrast...","Auto");
 			Roi roi = img.getRoi();
+			storedRoi = roi;
 			ImageProcessor ip = img.getProcessor();
 			ip.setRoi(roi);
 			ImageStatistics is = ip.getStatistics();
@@ -691,6 +707,8 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 			ic.setRoiArea(RoiArea);
 			initializeColor();
 
+
+
 		}
 
 		
@@ -714,7 +732,6 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		uniqueID.setSelected(true);
 		delCheck.setSelected(false);
 		if (counterImg.getStackSize() > 1) showAllCheck.setEnabled(true);
-		addButton.setEnabled(true);
 		removeButton.setEnabled(true);
 		renameButton.setEnabled(true);
 //		resultsButton.setEnabled(true);
@@ -745,15 +762,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	public void actionPerformed(final ActionEvent event) {
 		final String command = event.getActionCommand();
 
-		if (command.equals(ADD)) {
-			final int i = dynRadioVector.size() + 1;
-			dynGrid.setRows(i);
-			dynButtonPanel.add(makeDynRadioButton(i));
-			validateLayout();
-
-			if (ic != null) ic.setTypeVector(typeVector);
-		}
-		else if (command.equals(REMOVE)) {
+		if (command.equals(REMOVE)) {
 			if (dynRadioVector.size() > 1) {
 				final JRadioButton rbutton = dynRadioVector.lastElement();
 				dynButtonPanel.remove(rbutton);
@@ -786,6 +795,43 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		}
 		else if (command.equals(INITIALIZE)) {
 			initializeImage();
+		}
+		else if (command.equals(THRESHOLD)) {
+			if (ic == null) {
+				IJ.error("You need to initialize first");
+				return;
+			}
+				IJ.run("Threshold...");
+				IJ.setAutoThreshold(counterImg, "Default");
+		}
+		else if (command.startsWith(AUTOCOUNT)) {
+			if (currentMarkerVector == null) {
+				IJ.error("Please Select a Counter Type First");
+			} else {
+				IJ.run(counterImg, "Analyze Particles...", "display add");
+				IJ.run("Set Measurements...", "centroid stack redirect=None decimal=3");
+				ResultsTable resultTable = Analyzer.getResultsTable();
+				while (resultTable.size() == 0) {
+					resultTable = Analyzer.getResultsTable();
+				}
+				for (int i = 0; i < resultTable.size(); i++) {
+					if ((int) resultTable.getValue("Slice", i) == img.getCurrentSlice()) {
+						Calibration cal = img.getCalibration();
+						int x = (int) (resultTable.getValue("X", i)/cal.pixelWidth);
+						int y = (int) (resultTable.getValue("Y", i)/cal.pixelHeight);
+						if (storedRoi == null || storedRoi.contains(x, y)) {
+							final FissionTrackCntrMarker m = new FissionTrackCntrMarker(x, y, img.getCurrentSlice());
+//							currentMarkerIndex =
+//									Integer.parseInt(command.substring(TYPE_COMMAND_PREFIX.length())) - 1;
+//							currentMarkerVector = typeVector.get(currentMarkerIndex);
+//							ic.setCurrentMarkerVector(currentMarkerVector);
+							currentMarkerVector.addMarker(m);
+							m.setID(currentMarkerVector.getUniqueID());
+						}
+					}
+				}
+				repaint();
+			}
 		}
 		else if (command.startsWith(TYPE_COMMAND_PREFIX)) { // COUNT
 			currentMarkerIndex =
