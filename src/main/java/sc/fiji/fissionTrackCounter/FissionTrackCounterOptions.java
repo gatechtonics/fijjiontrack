@@ -42,6 +42,8 @@ import javax.swing.event.ChangeListener;
  * Options for the Cell Counter plugin.
  *
  * @author Curtis Rueden
+ * @author Ziya Ye
+ *
  */
 @Plugin(type = OptionsPlugin.class, label = "Cell Counter Options",
 	attrs = { @Attr(name = "legacy-only") })

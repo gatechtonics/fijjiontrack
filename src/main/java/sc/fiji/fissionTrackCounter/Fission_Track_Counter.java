@@ -28,6 +28,7 @@ import ij.plugin.frame.PlugInFrame;
 
 /**
  * @author Kurt De Vos
+ * @author Ziya Ye
  */
 public class Fission_Track_Counter extends PlugInFrame {
 
