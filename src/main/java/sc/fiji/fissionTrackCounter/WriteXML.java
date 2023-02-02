@@ -24,13 +24,10 @@
 
 package sc.fiji.fissionTrackCounter;
 
-import java.io.BufferedOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
+import ij.gui.Roi;
+
+import javax.xml.bind.DatatypeConverter;
+import java.io.*;
 import java.util.ListIterator;
 import java.util.Iterator;
 import java.util.Vector;
@@ -67,14 +64,14 @@ public class WriteXML {
 	}
 
 	public boolean writeXML(final String imgFilename,
-		final Vector<FissionTrackCntrMarkerVector> typeVector,
-		final int currentType,
-		final Map<String,String> metaData)
+							final Vector<FissionTrackCntrMarkerVector> typeVector,
+							final int currentType,
+							final Map<String,String> metaData, final Roi roi)
 	{
 		try {
 			out.write("<?xml version=\"1.0\" ");
 			out.write("encoding=\"UTF-8\"?>\r\n");
-			out.write("<CellCounter_Marker_File>\r\n");
+			out.write("<FissionTrackCounter_Marker_File>\r\n");
 
 			// write the image properties
 			out.write(" <Image_Properties>\r\n");
@@ -89,11 +86,21 @@ public class WriteXML {
 				out.write("     <" + key + ">" + value + "</" + key + ">\r\n");
 			}
 			out.write(" </Image_Properties>\r\n");
+			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+			ObjectOutputStream temp = new ObjectOutputStream(byteArrayOutputStream);
+			temp.writeObject(roi);
+			temp.close();
+			byte[] binaryRoiData = byteArrayOutputStream.toByteArray();
+
+			// Write the binary ROI data to the XML file
+			String binaryRoiDataString = DatatypeConverter.printBase64Binary(binaryRoiData);
+			out.write("<ROI>" + binaryRoiDataString + "</ROI>\r\n");
 
 			// write the marker data
 			out.write(" <Marker_Data>\r\n");
 			out.write("     <Current_Type>" + currentType + "</Current_Type>\r\n");
 			final ListIterator<FissionTrackCntrMarkerVector> it = typeVector.listIterator();
+
 			while (it.hasNext()) {
 				final FissionTrackCntrMarkerVector markerVector = it.next();
 				final int type = markerVector.getType();
@@ -119,7 +126,7 @@ public class WriteXML {
 			}
 
 			out.write(" </Marker_Data>\r\n");
-			out.write("</CellCounter_Marker_File>\r\n");
+			out.write("</FissionTrackCounter_Marker_File>\r\n");
 
 			out.flush(); // Don't forget to flush!
 			out.close();

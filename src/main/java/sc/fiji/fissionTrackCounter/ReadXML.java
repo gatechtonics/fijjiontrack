@@ -24,14 +24,18 @@
 
 package sc.fiji.fissionTrackCounter;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.Vector;
 
+import javax.xml.bind.DatatypeConverter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import ij.gui.Roi;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -88,6 +92,23 @@ public class ReadXML {
 		}
 		return null;
 	}
+	public Roi readRoi() throws IOException {
+		// Read the binary ROI data from the XML file
+		String binaryRoiDataString = getNodeListFromTag(doc, "ROI").item(0).getTextContent();
+		byte[] binaryRoiData = DatatypeConverter.parseBase64Binary(binaryRoiDataString);
+
+		// Convert the binary ROI data to an ROI object
+		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(binaryRoiData);
+		ObjectInputStream in = new ObjectInputStream(byteArrayInputStream);
+		Roi roi = null;
+		try {
+			roi = (Roi) in.readObject();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return roi;
+
+	}
 
 	public Vector<FissionTrackCntrMarkerVector> readMarkerData() {
 		final Vector<FissionTrackCntrMarkerVector> typeVector =
@@ -124,7 +145,7 @@ public class ReadXML {
 				marker.setY(Integer.parseInt(readValue(markerYNodeList, 0)));
 				marker.setZ(Integer.parseInt(readValue(markerZNodeList, 0)));
 				marker.setID(Integer.parseInt(readValue(markerIDNodeList, 0)));
-				markerVector.add(marker);
+				markerVector.addMarker(marker);
 			}
 			typeVector.add(markerVector);
 		}
