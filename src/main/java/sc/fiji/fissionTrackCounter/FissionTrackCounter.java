@@ -42,6 +42,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.IOException;
 import java.util.ListIterator;
 import java.util.Vector;
 import java.util.Map;
@@ -103,8 +104,8 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	private static final String ROIMODIFY = "Drag ROI";
 	private static final String TYPE_COMMAND_PREFIX = "type";
 	private static final String THRESHOLD = "Threshold";
-	private static final String AITRACKTIVE = "AiTracktive";
-	private static final String SKELETRACKS = "Skeletracks";
+//	private static final String AITRACKTIVE = "AiTracktive";
+//	private static final String SKELETRACKS = "Skeletracks";
 	private static final String AUTOCOUNT = "AutoCount";
 
 	private Vector<FissionTrackCntrMarkerVector> typeVector;
@@ -215,7 +216,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 
 		// this panel keeps the radiobuttons
 		autoButtonPanel = new JPanel();
-		GridLayout grid = new GridLayout(4, 1);
+		GridLayout grid = new GridLayout(2, 1);
 		grid.setVgap(2);
 		autoButtonPanel.setLayout(grid);
 
@@ -226,10 +227,10 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		gbc1.gridy = 1;
 		gb.setConstraints(autoPanel, gbc1);
 		autoPanel.add(autoButtonPanel);
-		aiTracktiveButton = makeButton(AITRACKTIVE, "Apply AiTracktive to image");
-		autoButtonPanel.add(aiTracktiveButton);
-		skeletracksButton = makeButton(SKELETRACKS, "Apply Skeletracks to image");
-		autoButtonPanel.add(skeletracksButton);
+//		aiTracktiveButton = makeButton(AITRACKTIVE, "Apply AiTracktive to image");
+//		autoButtonPanel.add(aiTracktiveButton);
+//		skeletracksButton = makeButton(SKELETRACKS, "Apply Skeletracks to image");
+//		autoButtonPanel.add(skeletracksButton);
 		thresholdButton = makeButton(THRESHOLD, "Apply threshold to image");
 		autoButtonPanel.add(thresholdButton);
 		autoCountButton = makeButton(AUTOCOUNT, "Auto Count fission tracks according to threshold");
@@ -607,7 +608,12 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 				final FissionTrackCntrMarkerVector markerVector = it.next();
 				final int count = markerVector.size();
 				final JTextField tArea = txtFieldVector.get(index);
-				tArea.setText("" + count);
+				if(markerVector.getType() >= 3) {
+					tArea.setText("" + (int)count/2);
+				}
+				else {
+					tArea.setText("" + count);
+				}
 			}
 		}
 		validateLayout();
@@ -821,10 +827,6 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 						int y = (int) (resultTable.getValue("Y", i)/cal.pixelHeight);
 						if (storedRoi == null || storedRoi.contains(x, y)) {
 							final FissionTrackCntrMarker m = new FissionTrackCntrMarker(x, y, img.getCurrentSlice());
-//							currentMarkerIndex =
-//									Integer.parseInt(command.substring(TYPE_COMMAND_PREFIX.length())) - 1;
-//							currentMarkerVector = typeVector.get(currentMarkerIndex);
-//							ic.setCurrentMarkerVector(currentMarkerVector);
 							currentMarkerVector.addMarker(m);
 							m.setID(currentMarkerVector.getUniqueID());
 						}
@@ -1056,6 +1058,16 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 			final Vector<FissionTrackCntrMarkerVector> loadedvector = rxml.readMarkerData();
 			typeVector = loadedvector;
 			ic.setTypeVector(typeVector);
+			Roi roi = null;
+			try {
+				roi = rxml.readRoi();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			Overlay displayList = new Overlay();
+			displayList.add(roi);
+			displayList.setStrokeColor(Color.white);
+			ic.setOverlay(displayList);
 			final int index =
 				Integer.parseInt(rxml.readImgProperties(ReadXML.CURRENT_TYPE));
 			currentMarkerVector = typeVector.get(index);
@@ -1118,7 +1130,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		if (!filePath.endsWith(".xml")) filePath += ".xml";
 		final WriteXML wxml = new WriteXML(filePath);
 		wxml.writeXML(img.getTitle(), typeVector, typeVector
-			.indexOf(currentMarkerVector), metaData);
+			.indexOf(currentMarkerVector), metaData, storedRoi);
 
 	}
 
@@ -1143,7 +1155,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		switch (dialogType) {
 			case (SAVE):
 				final String filename = img.getTitle();
-				fd.setFile("CellCounter_" +
+				fd.setFile("FissionTrackCounter_" +
 					filename.substring(0, filename.lastIndexOf(".") + 1) + "xml");
 				break;
 		}

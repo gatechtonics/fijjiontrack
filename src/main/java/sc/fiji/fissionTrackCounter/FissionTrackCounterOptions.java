@@ -45,7 +45,7 @@ import javax.swing.event.ChangeListener;
  * @author Ziya Ye
  *
  */
-@Plugin(type = OptionsPlugin.class, label = "Cell Counter Options",
+@Plugin(type = OptionsPlugin.class, label = "Fission Track Counter Options",
 	attrs = { @Attr(name = "legacy-only") })
 public class FissionTrackCounterOptions extends JFrame{
 

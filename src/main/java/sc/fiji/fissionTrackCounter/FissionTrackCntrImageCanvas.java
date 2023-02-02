@@ -409,16 +409,16 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 	public void measure3() {
 		Calibration cal = img.getCalibration();
 		String unit = cal.getUnit();
-		String columnHeadings = String.format("Type\tCount\tFrequency\tMean\tStandardDeviation");
+		String columnHeadings = String.format("Type\tCount\tArea(pixel)\tFrequency\tMean\tStandardDeviation");
 		IJ.setColumnHeadings(columnHeadings);
 		final ListIterator<FissionTrackCntrMarkerVector> it = typeVector.listIterator();
 		FissionTrackCntrMarkerVector mv = it.next();
 		int num = mv.size();
-		String resultsRow = String.format("%s\t%d\t%f", "Mount", num, (double) num / RoiArea);
+		String resultsRow = String.format("%s\t%d\t%d\t%f", "Mount", num, RoiArea, (double) num / RoiArea);
 		IJ.write(resultsRow);
 		mv = it.next();
 		num = mv.size();
-		resultsRow = String.format("%s\t%d\t%f", "Mica", num, (double) num / RoiArea);
+		resultsRow = String.format("%s\t%d\t%d\t%f", "Mica", num, RoiArea, (double) num / RoiArea);
 		IJ.write(resultsRow);
 		while (it.hasNext() && mv.getType() <= 3) {
 			mv = it.next();
