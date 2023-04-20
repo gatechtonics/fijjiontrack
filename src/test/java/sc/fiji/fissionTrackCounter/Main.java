@@ -26,9 +26,10 @@ import fiji.Debug;
 import ij.IJ;
 
 /**
- * Tests the {@link Fission_Track_Counter} plugin.
+ * Tests the {@link FissionTrackCounter} plugin.
  *
  * @author Curtis Rueden
+ * @author Ziya Ye
  */
 public class Main {
 

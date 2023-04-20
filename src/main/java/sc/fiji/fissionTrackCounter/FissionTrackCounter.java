@@ -42,24 +42,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.im.InputContext;
 import java.io.IOException;
-import java.util.ListIterator;
-import java.util.Vector;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JSeparator;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 
 import ij.process.ImageStatistics;
@@ -78,7 +66,7 @@ import org.scijava.options.OptionsService;
  */
 public class FissionTrackCounter extends JFrame implements ActionListener, ItemListener
 {
-	private static int RoiArea;
+	private static double RoiArea;
 
 	private static final String REMOVE = "Remove";
 	private static final String RENAME = "Rename";
@@ -109,16 +97,18 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	private static final String AUTOCOUNT = "AutoCount";
 
 	private Vector<FissionTrackCntrMarkerVector> typeVector;
+	private ArrayList<Vector<FissionTrackCntrMarkerVector>> allTypeVector = new ArrayList<>();
 	private Vector<JRadioButton> dynRadioVector;
 	private final Vector<JTextField> txtFieldVector;
 	private FissionTrackCntrMarkerVector markerVector;
 	private FissionTrackCntrMarkerVector currentMarkerVector;
 	private int currentMarkerIndex;
 	private Roi storedRoi;
+	private ArrayList<Roi> storedRoiList = new ArrayList<>();
 		
 	// Map<key,value> for storing metadata to write with WriteXML
 	private Map<String,String> metaData = new HashMap<>();
-
+	private ArrayList<Map<String, String>> metaDataList = new ArrayList<>();
 	private JPanel dynPanel;
 	private JPanel dynButtonPanel;
 	private JPanel statButtonPanel;
@@ -156,18 +146,24 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	private JButton measureButton;
 	private JButton measure3Button;
 	private JButton colorButton;
+	private JLabel textRoi;
 
 	private JButton gridButton;
 
 	private boolean keepOriginal = false;
 
 	private FissionTrackCntrImageCanvas ic;
-
+	private ArrayList<FissionTrackCntrImageCanvas> icList = new ArrayList<>();
+	private ArrayList<ImagePlus> imgList = new ArrayList<>();
 	private ImagePlus img;
+	private ArrayList<ImagePlus> counterImgList = new ArrayList<>();
 	private ImagePlus counterImg;
 	private GridLayout dynGrid;
 	private FissionTrackCounterOptions options = new FissionTrackCounterOptions();
+	private ImagePanel imagePanel = null;
+	private int currentImageIndex;
 	static FissionTrackCounter instance;
+
 
 
 	public FissionTrackCounter() {
@@ -295,6 +291,19 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		JRadioButton btn5 = makeDynRadioButton(5);
 		btn5.setText("C-axis");
 		dynButtonPanel.add(btn5);
+
+		gbc = new GridBagConstraints();
+		gbc.anchor = GridBagConstraints.NORTHWEST;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.weightx = 1.0;
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.ipadx = 5;
+
+		textRoi = new JLabel();
+		textRoi.setText("ROI Area: ");
+		dynPanel.add(textRoi, gbc);
+//		dynTxtPanel.add()
 
 		// create a "static" panel to hold control buttons
 		statButtonPanel = new JPanel();
@@ -447,7 +456,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 //		optionsButton = makeButton(OPTIONS, "show options dialog");
 //		gb.setConstraints(optionsButton, gbc);
 //		statButtonPanel.add(optionsButton);
-
+//
 //		gbc = new GridBagConstraints();
 //		gbc.anchor = GridBagConstraints.NORTHWEST;
 //		gbc.fill = GridBagConstraints.BOTH;
@@ -616,6 +625,8 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 				}
 			}
 		}
+
+
 		validateLayout();
 	}
 
@@ -626,8 +637,9 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		dynRadioVector.add(jrButton);
 		radioGrp.add(jrButton);
 		final String markerName = ("Type " + id);
-		markerVector = new FissionTrackCntrMarkerVector(id,markerName);
-		typeVector.add(markerVector);
+//		markerVector = new FissionTrackCntrMarkerVector(id,markerName);
+//
+//		typeVector.add(markerVector);
 		dynTxtPanel.add(makeDynamicTextArea());
 		return jrButton;
 	}
@@ -648,17 +660,97 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	private void initializeImage() {
 		reset();
 		//resetCAxis();
-		img = WindowManager.getCurrentImage();
 		final boolean v139t = IJ.getVersion().compareTo("1.39t") >= 0;
+		int[] ids = WindowManager.getIDList();
+		if (imagePanel != null) {
+			imagePanel.reset();
+		}
+		imagePanel = new ImagePanel(this);
+		add(imagePanel);
+		setVisible(true);
+//		imagePanel.setVisible(true);
+		for (int i = 0; i < ids.length; i++) {
+			// Get the ImagePlus object for each window
+			img = WindowManager.getImage(ids[i]);
+
+			// Get the title of each window
+			String title = img.getTitle();
+			imagePanel.addButton(title);
+//			imagePanel.setCurrentIndex(i);
+
+
+			typeVector = new Vector<FissionTrackCntrMarkerVector>();
+			for (int id = 1; id < 6; id++) {
+				final String markerName = ("Type " + id);
+				markerVector = new FissionTrackCntrMarkerVector(id,markerName);
+				typeVector.add(markerVector);
+			}
+			processImage(img, v139t);
+			img.close();
+			this.allTypeVector.add(typeVector);
+		}
+//		img = WindowManager.getCurrentImage();
+
+		
+		if (!keepOriginal) {
+			img.changes = false;
+//			img.close();
+		}
+		delCheck.setEnabled(true);
+		roiCheck.setEnabled(true);
+		numbersCheck.setEnabled(true);
+		showAllCheck.setSelected(false);
+		uniqueID.setSelected(true);
+		delCheck.setSelected(false);
+		if (counterImg.getStackSize() > 1) showAllCheck.setEnabled(true);
+		removeButton.setEnabled(true);
+		renameButton.setEnabled(true);
+//		resultsButton.setEnabled(true);
+		unDoButton.setEnabled(true);
+		resetButton.setEnabled(true);
+		resetCButton.setEnabled(true);
+		exportButton.setEnabled(true);
+		exportimgButton.setEnabled(true);
+		measureButton.setEnabled(true);
+		measure3Button.setEnabled(true);
+		colorButton.setEnabled(true);
+		gridButton.setEnabled(true);
+		initializeColor();
+
+	}
+	private void processImage(ImagePlus img, boolean v139t) {
 		if (img == null) {
 			IJ.noImage();
 		}else {
 			Roi roi = img.getRoi();
+			System.out.println("ROI in process Image: " + roi);
 			storedRoi = roi;
+			storedRoiList.add(roi);
 			ImageProcessor ip = img.getProcessor();
 			ip.setRoi(roi);
 			ImageStatistics is = ip.getStatistics();
-			RoiArea = is.pixelCount;
+			double pixelCount = is.pixelCount;
+//			System.out.println("Roi Area in pixel Count: " + RoiArea);
+
+
+// Get the calibration object and the unit of measurement
+			Calibration cal = img.getCalibration();
+//			String unit = cal.getUnit();
+
+//// Calculate the conversion factor based on the unit of measurement
+//			double conversionFactor = 1.0;
+//			System.out.println(unit);
+//			if (unit.equals("cm")) {
+//				conversionFactor = Math.pow(cal.pixelWidth, 2) * 10000;
+//			} else if (unit.equals("micron")) {
+//				conversionFactor = Math.pow(cal.pixelWidth, 2);
+//			}
+
+// Calculate the ROI area in square microns
+//			System.out.println(cal.pixelWidth);
+			RoiArea = (pixelCount * Math.pow(cal.pixelWidth, 2));
+//			System.out.println("roi in square microns: " + roiArea);
+
 			if (img.getStackSize() == 1) {
 				if (keepOriginal) ip = ip.crop();
 				counterImg = new ImagePlus("Counter Window - " + img.getTitle(), ip);
@@ -709,47 +801,30 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 				}
 				ic = new FissionTrackCntrImageCanvas(counterImg, typeVector, this, displayList);
 				new StackWindow(counterImg, ic);
+
 			}
+			cal = img.getCalibration();	//	to conserve voxel size of the original image
+			counterImg.setCalibration(cal);
+
+			// Extracting calibration data to write to XML
+			metaData.put("X_Calibration", "" + cal.pixelWidth);
+			metaData.put("Y_Calibration", "" + cal.pixelHeight);
+			metaData.put("Z_Calibration", "" + cal.pixelDepth);
+			metaData.put("Calibration_Unit", "" + cal.getUnit());
+			metaDataList.add(metaData);
+			metaData = new HashMap<>();
 			ic.setRoiArea(RoiArea);
-			initializeColor();
-
-
+			imgList.add(img);
+			counterImgList.add(counterImg);
+			icList.add(ic);
+//			final JTextField txtFld = new JTextField();
+//			txtFld.setHorizontalAlignment(SwingConstants.CENTER);
+//			txtFld.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+//			txtFld.setEditable(false);
+			textRoi.setText("ROI Area: " + String.format("%.2e", RoiArea/Math.pow(10, 8)));
+//
 
 		}
-
-		
-		Calibration cal = img.getCalibration();	//	to conserve voxel size of the original image
-		counterImg.setCalibration(cal);
-		
-		// Extracting calibration data to write to XML
-		metaData.put("X_Calibration", "" + cal.pixelWidth);
-		metaData.put("Y_Calibration", "" + cal.pixelHeight);
-		metaData.put("Z_Calibration", "" + cal.pixelDepth);
-		metaData.put("Calibration_Unit", "" + cal.getUnit());
-		
-		if (!keepOriginal) {
-			img.changes = false;
-			img.close();
-		}
-		delCheck.setEnabled(true);
-		roiCheck.setEnabled(true);
-		numbersCheck.setEnabled(true);
-		showAllCheck.setSelected(false);
-		uniqueID.setSelected(true);
-		delCheck.setSelected(false);
-		if (counterImg.getStackSize() > 1) showAllCheck.setEnabled(true);
-		removeButton.setEnabled(true);
-		renameButton.setEnabled(true);
-//		resultsButton.setEnabled(true);
-		unDoButton.setEnabled(true);
-		resetButton.setEnabled(true);
-		resetCButton.setEnabled(true);
-		exportButton.setEnabled(true);
-		exportimgButton.setEnabled(true);
-		measureButton.setEnabled(true);
-		measure3Button.setEnabled(true);
-		colorButton.setEnabled(true);
-		gridButton.setEnabled(true);
 
 	}
 
@@ -815,17 +890,33 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 				IJ.error("Please Select a Counter Type First");
 			} else {
 				IJ.run(counterImg, "Analyze Particles...", "display add");
-				IJ.run("Set Measurements...", "centroid stack redirect=None decimal=3");
+				IJ.run("Set Measurements...", "area centroid fit shape stack redirect=None decimal=3");
 				ResultsTable resultTable = Analyzer.getResultsTable();
+
 				while (resultTable.size() == 0) {
 					resultTable = Analyzer.getResultsTable();
 				}
+//				System.out.println("Result Table: " + resultTable);
+//				System.out.println("Result Table size: " + resultTable.size());
+//				System.out.println("img Current Slide: " + img.getCurrentSlice());
 				for (int i = 0; i < resultTable.size(); i++) {
-					if ((int) resultTable.getValue("Slice", i) == img.getCurrentSlice()) {
+					System.out.println("Result Table Slice: " + (int) resultTable.getValue("Slice", i));
+					if ((int) resultTable.getValue("Slice", i) == counterImg.getCurrentSlice()) {
 						Calibration cal = img.getCalibration();
 						int x = (int) (resultTable.getValue("X", i)/cal.pixelWidth);
 						int y = (int) (resultTable.getValue("Y", i)/cal.pixelHeight);
-						if (storedRoi == null || storedRoi.contains(x, y)) {
+						double major =  (resultTable.getValue("Major", i)/cal.pixelWidth);
+						double minor = (resultTable.getValue("Minor", i)/cal.pixelHeight);
+						double angle =  (resultTable.getValue("Angle", i)/cal.pixelHeight);
+						double area =  (resultTable.getValue("Area", i)/cal.pixelWidth);
+						double circ = (resultTable.getValue("Circ.", i)/cal.pixelWidth);
+						System.out.println("Major: " + major);
+						System.out.println("Minor: " + minor);
+						System.out.println("Angle: " + angle);
+						System.out.println("Area: " + area);
+						System.out.println("Circ: " + circ);
+						System.out.println("ROI in process Image: " + storedRoi);
+						if ((storedRoi == null || storedRoi.contains(x, y)) && 1 < area && area < 10 && circ > 0.5) {
 							final FissionTrackCntrMarker m = new FissionTrackCntrMarker(x, y, img.getCurrentSlice());
 							currentMarkerVector.addMarker(m);
 							m.setID(currentMarkerVector.getUniqueID());
@@ -836,6 +927,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 			}
 		}
 		else if (command.startsWith(TYPE_COMMAND_PREFIX)) { // COUNT
+			validateLayout();
 			currentMarkerIndex =
 				Integer.parseInt(command.substring(TYPE_COMMAND_PREFIX.length())) - 1;
 			if (ic == null) {
@@ -843,6 +935,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 				return;
 			}
 			// ic.setDelmode(false); // just in case
+//			System.out.println(currentMarkerIndex);
 			currentMarkerVector = typeVector.get(currentMarkerIndex);
 			ic.setCurrentMarkerVector(currentMarkerVector);
 		}
@@ -875,9 +968,10 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 			measure3();
 		} else if (command.equals(CHANGECOLOR)) {
 			int type = typeVector.indexOf(currentMarkerVector) + 1;
+//			System.out.println("we have correct type:" + type);
 			changeColor(type);
 			ic.repaint();
-		} else if (command.equals(GRID)){
+		} else if (command.equals(GRID)) {
 			IJ.run("Grid...");
 		}
 		if (ic != null) ic.repaint();
@@ -1209,5 +1303,20 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	public void initializeColor() {
 		options.initializeColor();
 	}
+	public Vector<FissionTrackCntrMarkerVector> getMarkerVector() {return this.typeVector;}
+	public void setMarkerVector(int index) {this.typeVector = this.allTypeVector.get(index);}
+	public ArrayList<Vector<FissionTrackCntrMarkerVector>> getAllTypeVector() {return  this.allTypeVector;}
+	public void setAllTypeVector(Vector<FissionTrackCntrMarkerVector> vector, int index) {
+		allTypeVector.set(index, vector);
+	}
+	public void setStoredRoi(int index) {storedRoi = storedRoiList.get(index);}
+	public void setCounterImg(int index) {counterImg = counterImgList.get(index);}
+	public void setIc(int index) {ic = icList.get(index);}
+
+	public ImagePlus getImg(int index) {return counterImgList.get(index);}
+	//	public void openImagePanel() {
+//		ImagePanel imagePanel = new ImagePanel();
+//		imagePanel.setVisible(true);
+//	}
 
 }
