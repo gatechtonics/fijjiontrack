@@ -41,4 +41,24 @@ public class Fission_Track_Counter extends PlugInFrame {
 	@Override
 	public void run(final String arg) {}
 
+
+//	public Fission_Track_Counter() {
+//		super("Fission Track Counter");
+//
+//		// Create instances of the FissionTrackCounter and ImagePanel classes
+//		FissionTrackCounter counterFrame = new FissionTrackCounter();
+//		ImagePanel imageFrame = new ImagePanel();
+//
+//		// Show the frames
+//		counterFrame.setVisible(true);
+//		imageFrame.setVisible(true);
+//	}
+//
+//	@Override
+//	public void run(final String arg) {}
+//
+//	public static void main(String[] args) {
+//		new Fission_Track_Counter();
+//	}
+
 }
