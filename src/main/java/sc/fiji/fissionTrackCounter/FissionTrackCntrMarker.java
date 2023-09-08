@@ -45,8 +45,6 @@ public class FissionTrackCntrMarker {
 		this.x = x;
 		this.y = y;
 		this.z = z;
-//		count = mCount;
-//		mCount++;
 	}
 
 	public int getX() {
@@ -86,8 +84,5 @@ public class FissionTrackCntrMarker {
 	public void setZ(final int z) {
 		this.z = z;
 	}
-
-	//Method to reduce the mCounnt val
-//	public void countReduce() {mCount--;}
 
 }

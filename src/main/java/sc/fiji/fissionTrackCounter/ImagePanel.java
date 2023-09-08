@@ -22,8 +22,6 @@ public class ImagePanel extends JPanel implements ActionListener {
 
     public ImagePanel(FissionTrackCounter counter) {
         this.counter = counter;
-
-//        setTitle("Image Panel");
         radioPanel = new JPanel();
         group = new ButtonGroup();
         radioPanel.setLayout(new BoxLayout(radioPanel, BoxLayout.Y_AXIS));
@@ -45,9 +43,7 @@ public class ImagePanel extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(final ActionEvent event) {
-        final String command = event.getActionCommand();
         int index = buttons.indexOf(event.getSource()); // get the index of the selected button
-//        System.out.println("Selected button index: " + index);
         counter.setMarkerVector(index);
         counter.setStoredRoi(index);
         counter.setCounterImg(index);
@@ -56,7 +52,6 @@ public class ImagePanel extends JPanel implements ActionListener {
         System.out.println(img);
         Window imgWindow = img.getWindow();
         System.out.println(imgWindow);
-//        WindowManager.setCurrentWindow(img.getWindow());
         imgWindow.toFront();
         ArrayList<Vector<FissionTrackCntrMarkerVector>> allTypeVector = counter.getAllTypeVector();
         System.out.println(allTypeVector);
