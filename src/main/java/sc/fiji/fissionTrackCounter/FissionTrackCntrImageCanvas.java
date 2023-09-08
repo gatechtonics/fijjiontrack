@@ -32,7 +32,7 @@ import ij.gui.Roi;
 import ij.gui.Toolbar;
 import ij.measure.Calibration;
 import ij.process.ImageProcessor;
-import javafx.scene.control.ColorPicker;
+
 
 import java.awt.BasicStroke;
 import java.awt.Cursor;
@@ -108,7 +108,6 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 				} else {
 					//Add one marker on screen
 					if( currentMarkerVector.getType() != 5 || currentMarkerVector.getcAxis()) {
-//						System.out.println(currentMarkerVector.getcAxis());
 						final FissionTrackCntrMarker m = new FissionTrackCntrMarker(x, y, img.getCurrentSlice());
 						currentMarkerVector.addMarker(m);
 						m.setID(currentMarkerVector.getUniqueID());
@@ -140,8 +139,6 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 				}
 				currentMarkerVector.remove(currentsmallest);
 
-//				currentMarkerVector.redNum();
-				//Reduce variable mCount in FissonTrackCntrMarker
 			}
 			repaint();
 			cc.populateTxtFields();
@@ -217,10 +214,8 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 				boolean cflag = false;
 				double x = 0;
 				double y = 0;
-//			int consistentCount = 0;
-				int uniqueCount = 0;
+//				int uniqueCount = 0;
 				while (mit.hasNext()) {
-//				consistentCount ++;
 					final FissionTrackCntrMarker m = mit.next();
 					if (true || showAll) {
 						xM = ((m.getX() - srcRect.x) * magnification);
