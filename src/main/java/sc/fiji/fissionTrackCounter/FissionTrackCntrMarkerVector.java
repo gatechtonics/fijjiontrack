@@ -46,12 +46,6 @@ public class FissionTrackCntrMarkerVector extends Vector<FissionTrackCntrMarker>
 	private String name;
 	private int num;//number of markers in the vector
 	private int uniqueID;
-	/**
-	 * If C-AXIS is ready to be drawn
-	 * True: cAxis is ready to be drawn
-	 * False: cAxis isn't ready to be drawn
-	 */
-	private boolean cAxis;
 
 
 	/** Creates a new instance of MarkerVector */
@@ -65,7 +59,6 @@ public class FissionTrackCntrMarkerVector extends Vector<FissionTrackCntrMarker>
 		this.type = type;
 		this.name = name;
 		this.uniqueID = 0;
-		this.cAxis = true;
 	}
 
 	public void addMarker(final FissionTrackCntrMarker marker) {
@@ -89,22 +82,9 @@ public class FissionTrackCntrMarkerVector extends Vector<FissionTrackCntrMarker>
 		this.uniqueID = 0;
 	}
 
-	//Method to celar all the CAxis on image cAxis
-	public void resetCAxis() {cAxis = true;}
-	//
-	public boolean getcAxis() {
-		return cAxis;
-	}
-
 	public int getUniqueID() {return uniqueID;}
-	//
-	public void setcAxis(boolean cAxis) {
-		this.cAxis = cAxis;
-	}
 
-	public void removeLastMarker() {
-		super.removeElementAt(size() - 1);
-	}
+	public void removeLastMarker() {super.removeElementAt(size() - 1);}
 
 	public FissionTrackCntrMarker getMarkerFromPosition(final Point p,
 														final int sliceIndex)

@@ -107,7 +107,7 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 					IJ.error("The point is outside of ROI");
 				} else {
 					//Add one marker on screen
-					if( currentMarkerVector.getType() != 5 || currentMarkerVector.getcAxis()) {
+					if( currentMarkerVector.getType() != 5 || currentMarkerVector.size() < 2) {
 						final FissionTrackCntrMarker m = new FissionTrackCntrMarker(x, y, img.getCurrentSlice());
 						currentMarkerVector.addMarker(m);
 						m.setID(currentMarkerVector.getUniqueID());
@@ -215,6 +215,10 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 				double x = 0;
 				double y = 0;
 //				int uniqueCount = 0;
+				if (typeID == 5 && mv.size() < 2){
+					cAxisVal = -361;
+					cAngle = "NA";
+				}
 				while (mit.hasNext()) {
 					final FissionTrackCntrMarker m = mit.next();
 					if (true || showAll) {
@@ -260,11 +264,11 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 							g2.drawLine((int) x, (int) y, (int) xM, (int) yM);
 							cAxisVal = 90 - atan(Math.abs(yM - y) / Math.abs(xM - x)) * 180 / PI;
 							cflag = false;
-							mv.setcAxis(false);
 						} else {
 							x = xM;
 							y = yM;
 							cflag = true;
+
 						}
 						g2.fillOval((int) xM, (int) yM, 1, 1);
 						g2.drawOval((int) xM, (int) yM, 1, 1);
@@ -350,14 +354,11 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 					final int xM = m.getX();
 					final int yM = m.getY();
 					final int zM = m.getZ();
-					System.out.println("zM = " + zM);
 					final double value = ip.getPixelValue(xM, yM);
 					double vAngle = -1;
 					int[] realPosArray = img.convertIndexToPosition(zM); // from the slice we get the array  [channel, slice, frame]
 					final int channel 	= realPosArray[0];
 					final int zPos		= realPosArray[1];
-					System.out.println("zPos = " + zPos);
-					System.out.println("Flag: " + flag);
 					final int frame 	= realPosArray[2];
 					final double xMcal 	= xM * cal.pixelWidth ;
 					final double yMcal 	= yM * cal.pixelHeight;
@@ -380,11 +381,9 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 								//!!Check, the angle is negative
 								cAngle = String.format("%.3f", distance* Math.cos(Math.toRadians( Math.abs(cAxisVal - vAngle))));
 							}
-							System.out.println("current z = " + z);
-							System.out.println("zMcal = " + zMcal);
 							double angleRadians = Math.asin((zMcal - z) / distance);
 							double azimuth = Math.toDegrees(Math.atan2((xMcal-x),(yMcal-y)));
-							double angleDegrees = Math.toDegrees(angleRadians);
+							double angleDegrees = Math.abs(Math.toDegrees(angleRadians));
 							String C_axisAngle = type.equals("2D") ? cAngle : "NA";
 							String plunge = type.equals("3D") ? String.format("%.3f", angleDegrees) : "NA";
 
@@ -395,7 +394,6 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 							x = xMcal;
 							y = yMcal;
 							z = zMcal;
-							System.out.println("last z = " + z);
 						}
 					}
 					//IJ.write(typeID + "\t" + zM + "\t" + xM + "\t" + yM + "\t" + value + "\t" + channel + "\t" + zPos + "\t" + frame + "\t" + xMcal + "\t" + yMcal + "\t" +zMcal);
@@ -461,7 +459,7 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 				sd += Math.pow(number - mean, 2);
 			}
 			sd = Math.sqrt(sd / numList.size());
-			resultsRow = String.format("%s\t%d\t%f\t%.3f\t%.3f", type, numList.size(), null,mean, sd);
+			resultsRow = String.format("%s\t%d\t%f\t%f\t%.3f\t%.3f", type, numList.size(), null, null, mean, sd);
 			IJ.write(resultsRow);
 //						String resultsRow = String.format("%s\t%.3f\t%.3f\t%.3f\t%.3f",type,distance,xMcal,yMcal,zMcal);
 //						IJ.write(resultsRow);
@@ -525,5 +523,7 @@ public class FissionTrackCntrImageCanvas extends ImageCanvas {
 	public void setRoiArea(final double area) {
 		this.RoiArea = area;
 	}
+	public double getRoiArea(){ return RoiArea; }
+
 
 }

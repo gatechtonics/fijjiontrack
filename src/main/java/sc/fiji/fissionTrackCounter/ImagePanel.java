@@ -1,5 +1,6 @@
 package sc.fiji.fissionTrackCounter;
 
+import ij.IJ;
 import ij.ImagePlus;
 import ij.WindowManager;
 
@@ -49,12 +50,10 @@ public class ImagePanel extends JPanel implements ActionListener {
         counter.setCounterImg(index);
         counter.setIc(index);
         ImagePlus img = counter.getImg(index);
-        System.out.println(img);
         Window imgWindow = img.getWindow();
-        System.out.println(imgWindow);
         imgWindow.toFront();
-        ArrayList<Vector<FissionTrackCntrMarkerVector>> allTypeVector = counter.getAllTypeVector();
-        System.out.println(allTypeVector);
+        counter.populateTxtFields();
+
     }
 
     public void setCounter(FissionTrackCounter counter) {
