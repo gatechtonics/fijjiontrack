@@ -1,6 +1,6 @@
 /*
  * #%L
- * Cell Counter plugin for ImageJ.
+ * Fission Track Counter plugin for ImageJ.
  * %%
  * Copyright (C) 2001 - 2019 Fiji developers.
  * %%
@@ -34,8 +34,6 @@ import ij.IJ;
 public class Main {
 
 	public static void main(final String... args) {
-
-		//IJ.runPlugIn(Fission_Track_Counter.class.getName(), "");
 		Debug.run("Fijjiontrack", "");
 	}
 
