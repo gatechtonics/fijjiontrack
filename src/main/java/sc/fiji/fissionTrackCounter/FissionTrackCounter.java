@@ -68,31 +68,32 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 
 	private static final String REMOVE = "Remove";
 	private static final String RENAME = "Rename";
-	private static final String INITIALIZE = "Initialize";
+	private static final String INITIALIZE = "Initialize ROI";
 	private static final String RESULTS = "Results";
-	private static final String UNDO = "Undo";
-	private static final String DELMODE = "Delete Mode";
+	private static final String UNDO = "UNDO";
+	private static final String DELMODE = "Delete mode";
 	private static final String UNIMODE = "Unique ID";
 	private static final String KEEPORIGINAL = "Keep Original";
-	private static final String SHOWNUMBERS = "Show Numbers";
+	private static final String SHOWCOUNTID = "Show Count ID";
 	private static final String SHOWALL = "Show All";
-	private static final String RESET = "Reset";
-	private static final String RESETCAIXS = "ResetCAxis";
-	private static final String GRID = "Grid Panel";
+	private static final String RESET = "Reset all";
+	private static final String RESETCAIXS = "Reset C-Axis";
+	private static final String GRID = "Counting grid";
 	private boolean grid = false;
 	private static final String EXPORTMARKERS = "Save Markers";
 	private static final String LOADMARKERS = "Load Markers";
-	private static final String EXPORTIMG = "Export Image";
-	private static final String MEASURE = "Detail";
-	private static final String MEASURE3 = "Summary";
-	private static final String CHANGECOLOR = "Change Color";
+	private static final String EXPORTIMG = "Export image";
+	private static final String MEASURE = "Detail table";
+	private static final String MEASURE3 = "Summary table";
+	private static final String CHANGECOLOR = "Change colors";
 	private static final String ROIMODIFY = "Drag ROI";
 	private static final String TYPE_COMMAND_PREFIX = "type";
 //	private static final String THRESHOLD = "Threshold";
 //	private static final String AITRACKTIVE = "AiTracktive";
 //	private static final String SKELETRACKS = "Skeletracks";
 //	private static final String AUTOCOUNT = "AutoCount";
-	private static final String YOLO = "ML AutoCount";
+	private static final String YOLO = "YOLO";
+	private static final String UPLOAD = "Upload Cfg Files";
 
 	private Vector<FissionTrackCntrMarkerVector> typeVector;
 	private ArrayList<Vector<FissionTrackCntrMarkerVector>> allTypeVector = new ArrayList<>();
@@ -126,9 +127,11 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 	private JButton initializeButton;
 	private JButton thresholdButton;
 	private JButton yoloButton;
+	private JButton uploadButton;
 	private JButton aiTracktiveButton;
 	private JButton skeletracksButton;
 	private JButton autoCountButton;
+
 
 //	private JButton optionsButton;
 	private JButton resultsButton;
@@ -200,7 +203,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		//dynGrid.setVgap(2);
 		// this panel will keep the dynamic GUI parts
 		dynPanel = new JPanel();
-		dynPanel.setBorder(BorderFactory.createTitledBorder("Manuel"));
+		dynPanel.setBorder(BorderFactory.createTitledBorder("Select Measurement"));
 		dynPanel.setLayout(gb);
 
 		// this panel keeps the radiobuttons
@@ -296,6 +299,12 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		gb.setConstraints(yoloButton, gbc);
 		autoPanel.add(yoloButton);
 		yoloButton.setEnabled(false);
+
+//		uploadButton = makeButton(UPLOAD, "upload cfg files for ML");
+//		gb.setConstraints(uploadButton, gbc);
+//		autoPanel.add(uploadButton);
+//		uploadButton.setEnabled(false);
+
 		gbc = new GridBagConstraints();
 		gbc.ipadx = 5;
 		gbc.gridx = 0;
@@ -305,6 +314,17 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		gb.setConstraints(autoPanel, gbc);
 
 		getContentPane().add(autoPanel);
+//
+//
+//		gbc = new GridBagConstraints();
+//		gbc.ipadx = 5;
+//		gbc.gridx = 0;
+//		gbc.gridy = 2;
+//		gb.setConstraints(autoPanel, gbc);
+//
+//		gb.setConstraints(autoPanel, gbc);
+//
+//		getContentPane().add(autoPanel);
 
 
 		// create a "static" panel to hold control buttons
@@ -454,7 +474,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.gridx = 0;
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
-		numbersCheck = new JCheckBox(SHOWNUMBERS);
+		numbersCheck = new JCheckBox(SHOWCOUNTID);
 		numbersCheck.setToolTipText("When selected, numbers are shown");
 		numbersCheck.setSelected(true);
 		numbersCheck.setEnabled(false);
@@ -541,6 +561,8 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		setSize(new Dimension(10000, 50));
 		setResizable(true);
 		EventQueue.invokeLater(runner);
+		System.out.println("button size: " + initializeButton.getSize());
+
 	}
 
 	private JTextField makeDynamicTextArea() {
@@ -591,6 +613,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 		final JButton jButton = new JButton(name);
 		jButton.setToolTipText(tooltip);
 		jButton.addActionListener(this);
+		jButton.setPreferredSize(new Dimension(137, 29));
 		return jButton;
 	}
 
@@ -626,6 +649,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 			img.changes = false;
 		}
 		yoloButton.setEnabled(true);
+		uploadButton.setEnabled(true);
 		delCheck.setEnabled(true);
 		roiCheck.setEnabled(true);
 		numbersCheck.setEnabled(true);
@@ -729,7 +753,6 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 			counterImgList.add(counterImg);
 			icList.add(ic);
 			textRoi.setText("ROI Area: " + String.format("%.2e", RoiArea/Math.pow(10, 8)));
-
 		}
 
 	}
@@ -764,8 +787,17 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 			if (currentMarkerVector == null) {
 				IJ.error("Please Select a Counter Type First");
 			} else {
-				URL yoloWeights = FissionTrackCounter.class.getResource("/yolov3_training_mica_Ziya.weights");
-				URL yoloCfg = FissionTrackCounter.class.getResource("/yolov3_training_Ziya.cfg");
+				currentMarkerVector.clear();
+				currentMarkerVector.resetID();
+				URL yoloWeights = null;
+				URL yoloCfg = FissionTrackCounter.class.getResource("/yolov3_training.cfg");;
+				if (currentMarkerIndex == 0) {
+					yoloWeights = FissionTrackCounter.class.getResource("/yolov3_training_apatite.weights");
+				} else if (currentMarkerIndex == 1) {
+					yoloWeights = FissionTrackCounter.class.getResource("/yolov3_training_mica.weights");
+				} else {
+					IJ.error("YOLO Cannot Be Used In This Counter Type");
+				}
 				File weightFile = null;
 				File cfgFile = null;
 				Net dnnNet;
@@ -776,7 +808,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 						OutputStream out = new FileOutputStream(weightFile);
 						int read;
 						byte[] bytes = new byte[1024];
-						InputStream input = getClass().getResourceAsStream("/yolov3_training_mica_Ziya.weights");
+						InputStream input = getClass().getResourceAsStream("/yolov3_training_mica.weights");
 						while ((read = input.read(bytes)) != -1) {
 							out.write(bytes, 0, read);
 						}
@@ -784,7 +816,7 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 						weightFile.deleteOnExit();
 						out = new FileOutputStream(cfgFile);
 						bytes = new byte[1024];
-						input = getClass().getResourceAsStream("/yolov3_training_Ziya.cfg");
+						input = getClass().getResourceAsStream("/yolov3_training.cfg");
 						while ((read = input.read(bytes)) != -1) {
 							out.write(bytes, 0, read);
 						}
@@ -892,6 +924,9 @@ public class FissionTrackCounter extends JFrame implements ActionListener, ItemL
 					}
 				}
 			}
+		}
+		else if (command.equals(UPLOAD)) {
+			System.out.println("TODO: UPLOAD CFG FILES");
 		}
 //		else if (command.startsWith(AUTOCOUNT)) {
 //			if (currentMarkerVector == null) {
